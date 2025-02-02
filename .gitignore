@@ -8,5 +8,8 @@ log.*
 *.aux
 *.tmp
 *.pdf
+*.bbl
+*.blg
+*.log
 
-.vscode
+_minted-main/

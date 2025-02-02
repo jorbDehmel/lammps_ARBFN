@@ -4,6 +4,12 @@
 
 # Changelog
 
+## `0.1.3` (2/2/2025)
+- Finished presentation in `docs/pres`
+- Added some vscode dotfiles
+- Removed erroneously added files in `docs/paper`
+- Added `docs` rule in root Makefile
+
 ## `0.1.2` (1/10/2025)
 - Added support for dipole moments (orientation components and
     magnitude $\mu$) via the `dipole` fix argument

@@ -4,7 +4,7 @@ LIBS := ARBFN/interchange.o
 .PHONY:	check
 check:
 	@echo "Checking for libboost-json and mpicxx w/ C++11..."
-	@$(CPP) example_controller.cpp -c -o /dev/null
+	@$(CPP) tests/example_controller.cpp -c -o /dev/null
 
 	@echo "Checking for python3..."
 	@python3 --version > /dev/null
@@ -25,6 +25,11 @@ check:
 	@clang-format --version > /dev/null
 
 	@echo "Environment is valid."
+
+.PHONY:	docs
+docs:	docs/paper/* docs/pres/*
+	$(MAKE) -C docs/paper
+	$(MAKE) -C docs/pres
 
 .PHONY:	format
 format:
@@ -50,7 +55,8 @@ test3:
 
 .PHONY:	clean
 clean:
-	find . -type f \( -iname '*.o' -or -iname '*.out' -or -iname '*.so' \) -exec rm -f "{}" \;
+	find . -type f \( -iname '*.o' -or -iname '*.out' -or \
+		-iname '*.so' \) -exec rm -f "{}" \;
 
 ################################################################
 # Docker launching stuff

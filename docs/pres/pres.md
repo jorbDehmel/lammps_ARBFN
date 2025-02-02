@@ -26,7 +26,7 @@ external "controller"
     - **Solution**: Define only protocol, not controller
 - Protocol should support cross-platform communication
     - **Solution**: JSON packets over MPI
-- Must handle latency
+- Must handle latency to avoid wasting server time
     - **Solution**: Throw error if controller isn't timely
 - Must assume that LAMMPS is distributed across many nodes
     - **Solution**: Use MPI, which LAMMPS already has
@@ -75,9 +75,9 @@ external "controller"
 
 # Using the Package
 
-1) Compile LAMMPS with this package enabled (more details in the
+1. Compile LAMMPS with this package enabled (more details in the
     repo root dir)
-2) In your LAMMPS script, apply the fix:
+2. In your LAMMPS script, apply the fix:
 
 ```lammps
 # Let all atoms be adjusted by the controller every 5 timesteps,
@@ -85,7 +85,7 @@ external "controller"
 fix fix_name all arbfn maxdelay 50.0 every 5
 ```
 
-3) Run the script and controller in the same `mpirun` command
+3. Run the script and controller in the same `mpirun` command
 
 ```sh
 # "123" can be any number EXCEPT 56789
@@ -95,4 +95,74 @@ mpirun -n 1 ../example_controller.out : \
 
 ---
 
-# Example
+# Example pt. 1: Controller (`wall_effect.cpp`)
+
+```cpp
+#include "controller.hpp"
+#include <boost/json/object.hpp>
+#include <cmath>
+constexpr double sigmoid(const double _x) {
+  return 1.0 / (1.0 + exp(-_x));
+}
+int main() {
+  // For each atom (as JSON), get the dfx, dfy, and dfz
+  independent_controller([](const auto &_json,
+                            double &, double &_dfy,
+                            double &) {
+    auto y = _json.at("y").as_double();
+    _dfy = 0.1 * (sigmoid((5.0 - 30.0 - y)) -
+                  sigmoid((y - 30.0 + 5.0)));
+  });
+  return 0;
+}
+```
+
+---
+
+# Example pt. 2: Script (`test.lmp`)
+
+```lammps
+# Simulation setup goes here
+
+# Add the external controller w/ maxdelay of 50 ms
+fix myarbfn all arbfn maxdelay 50.0
+
+# Run the simulation
+reset_timestep 0
+timestep 0.01
+run 4000000
+```
+
+---
+
+# Example pt. 3: Compile and run
+
+```sh
+# Compile
+mpicxx -O3 -std=c++11 -g \
+    -o wall_effect.out wall_effect.cpp
+
+# Run
+mpirun -n 1 wall_effect.out : \
+    -n 3 lmp -mpicolor 123 -in test.lmp
+```
+
+---
+
+# Future work
+
+- **This is 100-1000 times slower than usual**
+- Could improve speed when cores can be independently controlled
+- Also could add a "dump version" for speed when the controller
+    does not need to return anything
+- Will refine work w/ wall effect + AI control
+
+---
+
+# Gallery
+
+---
+
+# Code tour
+
+[Codebase on GitHub](https://github.com/jorbDehmel/lammps_arb_fn)

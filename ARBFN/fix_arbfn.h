@@ -32,7 +32,7 @@ FixStyle(arbfn,FixArbFn);
 #include "fix.h"
 #include "interchange.h"
 
-#define FIX_ARBFN_VERSION "0.1.2"
+#define FIX_ARBFN_VERSION "0.1.3"
 
 namespace LAMMPS_NS {
 class FixArbFn : public Fix {
