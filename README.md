@@ -3,7 +3,7 @@
 
 ![Test Badge](https://github.com/jorbDehmel/lammps_arb_fn/actions/workflows/ci-test.yml/badge.svg)
 
-J Dehmel, J Schiffbauer, 2024/25 (MIT License)
+J Dehmel, J Schiffbauer, Colorado Mesa University 2024/25 (MIT License)
 
 ## Motivation and Abstract
 
@@ -42,23 +42,19 @@ necessarily for non-testing compilation.
 - `python3-pip`
 - `mpi4py`
 - `git`
-- (Optional) `docker`
+- (Optional) `docker` or `podman`
 
-To check your system for the given requirements, run
+To check your system for the given requirements,
+run: `make check`
 
-```sh
-make check
-```
+To test the source code, run: `make test`
 
-from this directory. To test the source code, run
+(More details on installing the package inside a LAMMPS binary
+will be given later)
 
-```sh
-make test
-```
-from this directory. More details on installing it inside a
-LAMMPS binary will be given later. To enter a development
-`Docker` container, run `make launch-docker` from this
-directory.
+To enter a development `Docker` container, run `make docker`
+
+To enter a development `podman` container, run `make podman`
 
 After compiling and install LAMMPS with the extension, a simple
 testing script can be found in `./lmp_test`. You can run it
@@ -199,8 +195,9 @@ perspective.
             server shuts down.
         - If `"type"` is the string `"request"`, the JSON will
             encode the data (at minimum "x", "y", "z", "vx",
-            "vy", "vz", "fx", "fy", and "fz) of each atom it
-            owns into a list with the key `"atoms"`. The
+            "vy", "vz", "fx", "fy", and "fz": In some cases also
+            the dipole information "mux", "muy", "muz") of each
+            atom it owns into a list with the key `"atoms"`. The
             controller is expected to respond with either a
             packet of type `"waiting"` (requiring no additional
             information but prompting the worker to resent the
@@ -263,6 +260,5 @@ example controllers in `./tests/` as templates.
 
 ## Disclaimer
 
-FOSS under the MIT license. Supported by NSF grant
-INSERT GRANT NUMBER(S) HERE. Based upon work partially funded by
-Colorado Mesa University.
+FOSS under the MIT license. Supported by NSF grant 2126451.
+Based upon work partially funded by Colorado Mesa University.

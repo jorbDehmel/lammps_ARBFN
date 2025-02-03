@@ -30,6 +30,7 @@ check:
 docs:	docs/paper/* docs/pres/*
 	$(MAKE) -C docs/paper
 	$(MAKE) -C docs/pres
+	pandoc README.md -o README.pdf
 
 .PHONY:	format
 format:
@@ -59,23 +60,24 @@ clean:
 		-iname '*.so' \) -exec rm -f "{}" \;
 
 ################################################################
-# Docker launching stuff
+# Container launching stuff
 ################################################################
 
 # For absolute path usage later
 cwd := $(shell pwd)
 
-# Enter into the docker container
-.PHONY: launch-docker
-launch-docker:	| build Makefile
+.PHONY: docker
+docker:
+	docker build --tag 'arbfn' .
 	docker run \
-		--privileged \
-		--mount type=bind,source="/dev/",target="/dev/" \
 		--mount type=bind,source="${cwd}",target="/host" \
 		-i \
-		-t arbfn:latest \
+		-t arbfn:latest
 
-# Build the docker container from ./Dockerfile
-.PHONY:	build
-build:	| Makefile
-	docker build --tag 'arbfn' .
+.PHONY: podman
+podman:
+	podman build --tag 'arbfn' .
+	podman run \
+		--mount type=bind,source="${cwd}",target="/host" \
+		-i \
+		-t arbfn:latest
