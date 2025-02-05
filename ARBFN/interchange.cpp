@@ -131,10 +131,12 @@ bool await_packet(const double &_max_ms, boost::json::object &_into, std::random
  * @param _from An array of atom data to send
  * @param _into An array of fix data that was received
  * @param _max_ms The max number of milliseconds to await each response
+ * @param _controller_rank The rank of the controller within the provided communicator
+ * @param _comm The MPI communicator to use
  * @returns true on success, false on failure
  */
 bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], const double &_max_ms,
-                 const uint &_controller_rank, MPI_Comm &_comm)
+                 const uint &_controller_rank, MPI_Comm &_comm, const bool &_expect_response)
 {
   bool got_fix, result;
   boost::json::object json_send, json_recv;
@@ -152,6 +154,8 @@ bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], cons
 
   to_send = json_to_str(json_send);
   MPI_Send(to_send.c_str(), to_send.size(), MPI_CHAR, _controller_rank, 0, _comm);
+
+  if (!_expect_response) { return true; }
 
   // Await response
   got_fix = false;
@@ -228,4 +232,59 @@ void send_deregistration(const int &_controller_rank, MPI_Comm &_comm)
 {
   std::string to_send = "{\"type\": \"deregister\"}";
   MPI_Send(to_send.c_str(), to_send.size(), MPI_CHAR, _controller_rank, 0, _comm);
+}
+
+/**
+ * @brief Interchange, but for ffield fixes. This only happens once, upon simulation initialization.
+ * @param _start A 3-tuple (x, y, z) of the lowest corner of the simulation box.
+ * @param _bin_widths A 3-tuple for the x, y, and z spacing of the nodes.
+ * @param _bin_counts The number of bins per side. A 3-tuple of the x, y, and z.
+ * @param _controller_rank The rank of the controller within the provided communicator
+ * @param _comm The MPI communicator to use
+ * @returns A std::list of the data to be added
+ */
+std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
+                                             const uint _bin_counts[3],
+                                             const uint &_controller_rank, MPI_Comm &_comm)
+{
+  boost::json::object to_send;
+
+  to_send["type"] = "gridRequest";
+  to_send["start"] = boost::json::array({_start[0], _start[1], _start[2]});
+  to_send["binWidths"] = boost::json::array({_bin_widths[0], _bin_widths[1], _bin_widths[2]});
+  to_send["binCounts"] = boost::json::array({_bin_counts[0], _bin_counts[1], _bin_counts[2]});
+
+  std::stringstream to_send_strm;
+  to_send_strm << to_send;
+  const std::string to_send_string = to_send_strm.str();
+
+  MPI_Send(to_send_string.c_str(), to_send_string.size(), MPI_CHAR, _controller_rank, 0, _comm);
+
+  MPI_Status status;
+  MPI_Probe(_controller_rank, 0, _comm, &status);
+
+  char *buffer = new char[status._ucount + 1];
+  MPI_Recv(buffer, status._ucount, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, _comm, &status);
+  buffer[status._ucount] = '\0';
+
+  boost::json::object response = boost::json::parse(buffer).as_object();
+
+  // array of points
+  std::list<FFieldNodeData> out;
+
+  const auto points = response.at("points").as_array();
+  for (const auto &point : points) {
+    FFieldNodeData to_add;
+    to_add.x_index = point.at("xIndex").as_int64();
+    to_add.ybin = point.at("yIndex").as_int64();
+    to_add.zbin = point.at("zIndex").as_int64();
+    to_add.dfx = point.at("dfx").as_double();
+    to_add.dfy = point.at("dfy").as_double();
+    to_add.dfz = point.at("dfz").as_double();
+    out.push_back(to_add);
+  }
+
+  delete[] buffer;
+
+  return out;
 }

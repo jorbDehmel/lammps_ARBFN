@@ -31,6 +31,8 @@ LAMMPS_NS::FixArbFn::FixArbFn(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp,
       ++i;
     } else if (strcmp(arg, "dipole") == 0) {
       is_dipole = !is_dipole;
+    } else if (strcmp(arg, "dumponly") == 0) {
+      expect_response = !expect_response;
     }
 
     else {
@@ -67,11 +69,12 @@ void LAMMPS_NS::FixArbFn::post_force(int)
   }
 
   // Meta
-  double *const *const x = atom->x;
-  double *const *const v = atom->v;
+  const double *const *const x = atom->x;
+  const double *const *const v = atom->v;
+  const double *const *const mu = atom->mu;
+  const int *const mask = atom->mask;
+
   double *const *const f = atom->f;
-  double *const *const mu = atom->mu;
-  int *const mask = atom->mask;
 
   // Variables
   bool success;
@@ -106,8 +109,9 @@ void LAMMPS_NS::FixArbFn::post_force(int)
 
   // Transmit atoms, receive fix data
   FixData *to_recv = new FixData[n];
-  success = interchange(n, to_send.data(), to_recv, max_ms, controller_rank, comm);
+  success = interchange(n, to_send.data(), to_recv, max_ms, controller_rank, comm, expect_response);
   if (!success) { error->all(FLERR, "`fix arbfn' failed interchange."); }
+  if (!expect_response) { return; }
 
   // Translate FixData struct to LAMMPS force info
   n = 0;

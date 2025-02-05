@@ -12,9 +12,9 @@
 -------------------------------------------------------------------------
     Defines the `fix arbfn` class for extending LAMMPS. Based on FixQMMM
     from the QMMM package. Based on work funded by NSF grant
-    <TODO: GRANT NUMBER HERE!!!!> at Colorado Mesa University.
+    2126451 at Colorado Mesa University.
 
-    J Dehmel, J Schiffbauer, 2024
+    J Dehmel, J Schiffbauer, 2024/2025
 ------------------------------------------------------------------------- */
 
 #ifdef FIX_CLASS
@@ -32,9 +32,13 @@ FixStyle(arbfn,FixArbFn);
 #include "fix.h"
 #include "interchange.h"
 
-#define FIX_ARBFN_VERSION "0.1.3"
-
 namespace LAMMPS_NS {
+/**
+ * @class FixArbFn
+ * @brief A fix which communicates with an external controller
+ * for arbitrary atomic force fixes. By default, this updates
+ * every timestep. This is VERY slow.
+ */
 class FixArbFn : public Fix {
  public:
   FixArbFn(class LAMMPS *, int, char **);
@@ -50,6 +54,7 @@ class FixArbFn : public Fix {
   MPI_Comm comm;
   uintmax_t every, counter;
   bool is_dipole = false;
+  bool expect_response = true;
 };
 }    // namespace LAMMPS_NS
 

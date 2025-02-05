@@ -1,8 +1,16 @@
 
 # Todo
 - Currently hangs in error states: Make it shut down properly
+- Allow controller to die early in `arbfn/ffield` environments
+- Test and document `arbfn dumponly` flag
+- Remove `stl` dependencies
 
 # Changelog
+
+## `0.1.4` (2/5/2025)
+- Added `fix arbfn/ffield` for more efficient constant force
+    fields
+- Updated docs
 
 ## `0.1.3` (2/2/2025)
 - Finished presentation in `docs/pres`

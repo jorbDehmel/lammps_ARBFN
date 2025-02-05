@@ -34,11 +34,11 @@ requirements for compilation:
 - Some MPI provider (EG `openmpi`: You probably also have this
     if you are compiling LAMMPS)
 - `boost` library for `C++` (specifically `boost_json`)
+- `python3` (for the install script)
 
 The following software is required for testing, but not
 necessarily for non-testing compilation.
 
-- `python3`
 - `python3-pip`
 - `mpi4py`
 - `git`
@@ -88,32 +88,6 @@ from this directory and follow the instructions given.
 source code somewhere locally: Directions for this can be found
 in the aforementioned LAMMPS build guide.
 
-## Using the Fix
-
-The `ARBFN` package provides the `arbfn` fix, shown below.
-
-```lammps
-fix name_1 all arbfn
-fix name_2 all arbfn maxdelay 50.0
-fix name_3 all arbfn every 100
-fix name_4 all arbfn maxdelay 50.0 every 100
-```
-
-The `maxdelay X` (where `X` is the max number of milliseconds to
-await a response before erroring, with $0.0$ ms meaning no
-limit) and `every Y` (where the fix is applied every `Y`
-timesteps, with $1$ being every step and $0$ being undefined)
-arguments are both optional. The default max delay is $0.0$ (no
-limit) and the default periodicity is $1$ (apply every
-time step).
-
-There is also the `dipole` argument, which includes the values
-`"mu"`, `"mux"`, `"muy"`, `"muz"` from LAMMPS for each atom.
-
-```lammps
-fix name_5 all arbfn dipole
-```
-
 ## Running Simulations
 
 Although LAMMPS is built on MPI, extra care is needed when
@@ -148,7 +122,33 @@ mpirun -n 1 \
     lmp -mpicolor 123 -in input_script.lmp
 ```
 
-## Protocol
+## Using the `arbfn` Fix
+
+The `ARBFN` package provides the `arbfn` fix, shown below.
+
+```lammps
+fix name_1 all arbfn
+fix name_2 all arbfn maxdelay 50.0
+fix name_3 all arbfn every 100
+fix name_4 all arbfn maxdelay 50.0 every 100
+```
+
+The `maxdelay X` (where `X` is the max number of milliseconds to
+await a response before erroring, with $0.0$ ms meaning no
+limit) and `every Y` (where the fix is applied every `Y`
+timesteps, with $1$ being every step and $0$ being undefined)
+arguments are both optional. The default max delay is $0.0$ (no
+limit) and the default periodicity is $1$ (apply every
+time step).
+
+There is also the `dipole` argument, which includes the values
+`"mu"`, `"mux"`, `"muy"`, `"muz"` from LAMMPS for each atom.
+
+```lammps
+fix name_5 all arbfn dipole
+```
+
+## `fix arbfn` Protocol
 
 This section uses pseudocode and standard MPI calls to outline
 the protocol used from both the controller and worker
@@ -158,7 +158,7 @@ controller and at least one LAMMPS "worker".
 We begin by describing the protocol from the controller's
 perspective.
 
-1) (SERVER) Initial MPI setup
+1. Initial MPI setup
     - Call `MPI_Init` to initialize the system
     - Call `MPI_Comm_split` to split `MPI_COMM_WORLD` off into
         a "junk" communicator which can then be discarded. This
@@ -176,7 +176,7 @@ perspective.
         `ARBFN` fixes from the default LAMMPS communicator. The
         same synchronization issues will occur upon omission of
         this step as the previous.
-2) (SERVER) Enter server loop
+2. Enter server loop
     - Unless exited, repeat this step (2) forever after completion
     - Make a call to `MPI_Probe` with any source and tag,
         storing the resulting information. Since we are using
@@ -209,7 +209,7 @@ perspective.
             minimum) "dfx", "dfy", and "dfz". Each of these will
             be a double corresponding to the prescribed deltas
             in force for their respective dimension.
-3) (SERVER) Shutdown
+3. Shutdown
     - After all workers have send `"deregister"` packets, LAMMPS
         will begin shutting down. This entails one final MPI
         barrier, so we the controller must call `MPI_Barrier`
@@ -223,17 +223,17 @@ This ends our description of the controller protocol. We will
 now describe the worker side of the protocol, omitting any
 information which can be deduced from the above.
 
-1) (WORKER) LAMMPS internal setup
+1. LAMMPS internal setup
     - Since our workers are fix objects, they have no say in the
         initial MPI setup of LAMMPS. This is where the first
         `MPI_Comm_split` call synchronization occurs.
-2) (WORKER) Additional setup
+2. Additional setup
     - Upon fix object instantiation, we must make a second
         `MPI_Comm_split` splitting `MPI_COMM_WORLD` into a
         usable communicator with the color $56789$. This
         corresponds with our second synchronization call on the
         controller side.
-3) (WORKER) Controller discovery
+3. Controller discovery
     - At instantiation, our fix does not know the rank of the
         controller. Thus, the worker will iterate through all
         non-self ranks in the communicator and send a
@@ -241,14 +241,132 @@ information which can be deduced from the above.
         recipients will be workers and not respond, but the one
         that sends back an `"ack"` packet will be recorded as
         the controller.
-4) (WORKER) Work
+4. Work
     - For as long as LAMMPS lives, it will call the fix to do
         work in the form of the `post_force` procedure. This
         will iterate through the owned atoms of this worker
         instance, send them in the aforementioned format to the
         controller, receive the controller's prescription, and
         add the force deltas.
-5) (WORKER) Deregistration and cleanup
+5. Deregistration and cleanup
+    - Once LAMMPS is done, the fix destructor will be called.
+        This method must send the deregistration packet to the
+        controller and free up any resources used (MPI or
+        standard). The worker **does not** need to call
+        `MPI_Barrier`, unlike the controller.
+
+When developing a controller, it is best to use the provided
+example controllers in `./tests/` as templates.
+
+## Using the `arbfn/ffield` Fix
+
+The `ARBFN` package also provides the `arbfn/ffield` fix, shown
+below.
+
+```lammps
+fix name_1 all arbfn/ffield
+```
+
+## `fix arbfn/ffield` Protocol
+
+This section uses pseudocode and standard MPI calls to outline
+the protocol used from both the controller and worker
+perspective. The reader should assume that there is exactly one
+controller and at least one LAMMPS "worker".
+
+We begin by describing the protocol from the controller's
+perspective.
+
+1. Initial MPI setup
+    - Call `MPI_Init` to initialize the system
+    - Call `MPI_Comm_split` to split `MPI_COMM_WORLD` off into
+        a "junk" communicator which can then be discarded. This
+        is necessary because LAMMPS uses an internal
+        `MPI_Comm_split` upon instantiation, and all processes
+        in the world must make the call before the process will
+        advance. If this is not done, the system will hang
+        without error indefinitely.
+    - Call `MPI_Comm_split` **for the 2nd time**, this time
+        splitting `MPI_COMM_WORLD` off using the color $56789$
+        (the color all our MPI comms are expected to have) into
+        a communicator which we save. This will be the
+        communicator that we use for the remainder of the
+        protocol, and corresponds to the splitting off of the
+        `ARBFN` fixes from the default LAMMPS communicator. The
+        same synchronization issues will occur upon omission of
+        this step as the previous.
+2. Enter server loop
+    - Unless exited, repeat this step (2) forever after
+        completion
+    - Make a call to `MPI_Probe` with any source and tag,
+        storing the resulting information. Since we are using
+        the colored communicator, this will only every receive
+        messages from the worker instances.
+    - Upon receiving the non-null-terminated ASCII string
+        message, save it to a string and decode it into a JSON
+        object. The JSON object is guaranteed to have an
+        attribute with the key `"type"`.
+        - If `"type"` is the string `"register"`, increment some
+            counter of the number of registered workers and send
+            back a JSON packet with type `"ack"`.
+        - If `"type"` is the string `"deregister"`, decrement
+            the aforementioned counter. If it is now zero, exit
+            the server loop. This is the only case in which the
+            server shuts down.
+        - If `"type"` is the string `"gridRequest"`, the JSON
+            will have the values `"start"` (the x/y/z box
+            starting coordinates), `"binWidth"` (the dx/dy/dz
+            between nodes in space), and `"binCounts"` (the
+            number of bins per size). It will expect a return
+            value of an object with `"points"` being an array.
+            Each item of `"points"` must have attributes
+            `xIndex`, `yIndex`, `zIndex` (the bin indices),
+            `dfx`, `dfy`, and `dfz` (the force field
+            contributions at that node).
+3. Shutdown
+    - After all workers have send `"deregister"` packets, LAMMPS
+        will begin shutting down. This entails one final MPI
+        barrier, so we the controller must call `MPI_Barrier`
+        on **`MPI_COMM_WORLD`**. After this, LAMMPS will halt.
+    - Now, the controller must shut down and free its resources
+        in the traditional `C` MPI way (EG `MPI_Comm_free` and
+        `MPI_Finalize`). The server can now halt. If improperly
+        synced, the system will hang without error.
+
+This ends our description of the controller protocol. We will
+now describe the worker side of the protocol, omitting any
+information which can be deduced from the above.
+
+1. LAMMPS internal setup
+    - Since our workers are fix objects, they have no say in the
+        initial MPI setup of LAMMPS. This is where the first
+        `MPI_Comm_split` call synchronization occurs.
+2. Additional setup
+    - Upon fix object instantiation, we must make a second
+        `MPI_Comm_split` splitting `MPI_COMM_WORLD` into a
+        usable communicator with the color $56789$. This
+        corresponds with our second synchronization call on the
+        controller side.
+3. Controller discovery
+    - At instantiation, our fix does not know the rank of the
+        controller. Thus, the worker will iterate through all
+        non-self ranks in the communicator and send a
+        `"registration"` packet to each one. All but one of the
+        recipients will be workers and not respond, but the one
+        that sends back an `"ack"` packet will be recorded as
+        the controller.
+4. Initialization and work
+    - At instantiation, the worker will send a `"gridRequest"`
+        packet to the server. This will contain the data
+        mentioned in the previous section, and the controller
+        will respond in the aforementioned way
+    - After getting the data for each node, the worker will save
+        it locally
+    - When an atom needs fixed, the worker will find the 8
+        nearest mesh points. It will perform a trilinear
+        interpolation in $(x, y, z)$ space for `dfx`, `dfy`, and
+        `dfz`, adding the results to the atom's total forces
+5. Deregistration and cleanup
     - Once LAMMPS is done, the fix destructor will be called.
         This method must send the deregistration packet to the
         controller and free up any resources used (MPI or

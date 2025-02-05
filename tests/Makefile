@@ -1,6 +1,9 @@
 CPP := mpicxx -O3 -std=c++11
 LIBS := ../ARBFN/interchange.o
 
+.PHONY:	test
+test:	test4 test1 test2 test3
+
 %.o:	%.cpp
 	$(CPP) -c -o $@ $^ $(EXTRA)
 
@@ -16,9 +19,6 @@ format:
 		-exec clang-format -i "{}" \;
 	find . -type f -iname "*.py" -exec \
 		autopep8 --in-place --aggressive --aggressive "{}" \;
-
-.PHONY:	test
-test:	test1 test2 test3
 
 .PHONY:	test1
 test1:	example_controller.out example_worker.out
@@ -40,6 +40,10 @@ test3:	example_bulk_controller.out example_worker.out
 		./example_bulk_controller.out \
 		: --map-by :OVERSUBSCRIBE -n 3 \
 		./example_worker.out
+
+.PHONY:	test4
+test4:	test_interpolation.out
+	./$<
 
 .PHONY:	clean
 clean:

@@ -8,9 +8,12 @@
 
 #include <chrono>
 #include <cstddef>
+#include <list>
 #include <mpi.h>
 #include <random>
 #include <thread>
+
+#define FIX_ARBFN_VERSION "0.1.4"
 
 /**
  * @brief The color all ARBFN comms will be expected to have
@@ -56,6 +59,34 @@ struct FixData {
 };
 
 /**
+ * @struct FFieldNodeData
+ * @brief Used for passing around FField fix nodes
+ * @var FFieldNodeData::x_index The x index of the node
+ * @var FFieldNodeData::y_index The y index of the node
+ * @var FFieldNodeData::z_index The z index of the node
+ * @var FFieldNodeData::dfx The delta to be added to fx
+ * @var FFieldNodeData::dfy The delta to be added to fy
+ * @var FFieldNodeData::dfz The delta to be added to fz
+ */
+struct FFieldNodeData {
+  uint x_index, ybin, zbin;
+  double dfx, dfy, dfz;
+};
+
+/**
+ * @brief Interchange, but for ffield fixes. This only happens once, upon simulation initialization.
+ * @param _start A 3-tuple (x, y, z) of the lowest corner of the simulation box.
+ * @param _bin_widths A 3-tuple for the x, y, and z spacing of the nodes.
+ * @param _bin_counts The number of bins per side. A 3-tuple of the x, y, and z.
+ * @param _controller_rank The rank of the controller within the provided communicator
+ * @param _comm The MPI communicator to use
+ * @returns A std::list of the data to be added
+ */
+std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
+                                             const uint _bin_counts[3],
+                                             const uint &_controller_rank, MPI_Comm &_comm);
+
+/**
  * @brief Send the given atom data, then receive the given fix data. This is blocking, but does not allow worker-side gridlocks.
  * @param _n The number of atoms/fixes in the arrays.
  * @param _from An array of atom data to send
@@ -66,7 +97,8 @@ struct FixData {
  * @returns true on success, false on failure
  */
 bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], const double &_max_ms,
-                 const uint &_controller_rank, MPI_Comm &_comm);
+                 const uint &_controller_rank, MPI_Comm &_comm,
+                 const bool &_expect_response = true);
 
 /**
  * @brief Sends a registration packet to the controller.

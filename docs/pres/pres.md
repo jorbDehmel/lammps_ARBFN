@@ -73,7 +73,7 @@ external "controller"
 
 ---
 
-# Using the Package
+# Using `fix arbfn`
 
 1. Compile LAMMPS with this package enabled (more details in the
     repo root dir)
@@ -149,13 +149,17 @@ mpirun -n 1 wall_effect.out : \
 
 ---
 
-# Future work
+# Special case: Static force fields
 
-- **This is 100-1000 times slower than usual**
-- Could improve speed when cores can be independently controlled
-- Also could add a "dump version" for speed when the controller
-    does not need to return anything
-- Will refine work w/ wall effect + AI control
+- If we want to impose constant force fields, we can be much
+    more efficient
+- We provide `fix arbfn/ffield` for this purpose
+- Gets a finite set of "nodes" in space w/ `dfx`, `dfy`, and
+    `dfz` data from the MPI controller via the `"gridRequest"`
+    special case request
+- Trilinearly interpolates in $x/y/z$ space for the force deltas
+- This runs **as fast as normal LAMMPS**, while still allowing
+    for arbitrary force fields
 
 ---
 

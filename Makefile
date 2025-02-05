@@ -40,18 +40,7 @@ format:
 		autopep8 --in-place --aggressive --aggressive "{}" \;
 
 .PHONY:	test
-test:	test1 test2 test3
-
-.PHONY:	test1
-test1:
-	$(MAKE) -C tests $@
-
-.PHONY:	test2
-test2:
-	$(MAKE) -C tests $@
-
-.PHONY:	test3
-test3:
+test:
 	$(MAKE) -C tests $@
 
 .PHONY:	clean
