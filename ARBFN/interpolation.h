@@ -3,14 +3,22 @@
  * @brief Provides interpolation functions for use in LAMMPS via
  * the ARBFN package. Specifically, these are for
  * `fix arbfn/ffield`.
+ * @author J Dehmel, 2025. Written under MIT license.
  */
 
 #pragma once
-
 #include <cmath>
-#include <cstdint>
-#include <sys/types.h>
 
+/**
+ * @brief Linearly interpolates the 3-tuple of force deltas
+ * between 2 points in space (by convention, we call the
+ * positions x, but that doesn't need to be true).
+ * @param _force_deltas Where to save the interpolated values
+ * @param _x The distance from x0
+ * @param _dx The the distance between x0 and x1
+ * @param _x0_force_deltas The force deltas if you are on x0
+ * @param _x1_force_deltas The force deltas if you are on x1
+ */
 inline void interpolate_line(double _force_deltas[3], const double &_x, const double &_dx,
                              const double _x0_force_deltas[3], const double _x1_force_deltas[3])
 {
@@ -21,6 +29,19 @@ inline void interpolate_line(double _force_deltas[3], const double &_x, const do
   _force_deltas[2] = _x0_force_deltas[2] * x0_frac + _x1_force_deltas[2] * x1_frac;
 }
 
+/**
+ * @brief Bilinearly interpolate between 4 equidistant points
+ * (by convention, we use x and y). _pos and _d_pos are
+ * 3-tuples, but only the first 2 entries are used. It is
+ * assumed that x1 > x0, y1 > y0
+ * @param _force_deltas Where to save the interpolation
+ * @param _pos The relative position to x0 y0
+ * @param _d_pos The spacing between nodes (x, y, z)
+ * @param _x0_y0_force_deltas The force deltas for x0y0
+ * @param _x1_y0_force_deltas The force deltas for x1y0
+ * @param _x0_y1_force_deltas The force deltas for x0y1
+ * @param _x1_y1_force_deltas The force deltas for x1y1
+ */
 inline void interpolate_plane(double _force_deltas[3], const double _pos[3], const double _d_pos[3],
                               const double _x0_y0_force_deltas[3],
                               const double _x1_y0_force_deltas[3],
@@ -36,6 +57,22 @@ inline void interpolate_plane(double _force_deltas[3], const double _pos[3], con
   interpolate_line(_force_deltas, _pos[1], _d_pos[1], y0_force_deltas, y1_force_deltas);
 }
 
+/**
+ * @brief Trilinearly interpolate between 8 equidistant points
+ * (by convention, x, y, and z). It is assumed that x1 > x0,
+ * y1 > y0, z1 > z0.
+ * @param _force_deltas The results of the interpolation
+ * @param _pos The offset from x0y0z0
+ * @param _d_pos The spacing between nodes
+ * @param _x0_y0_z0_force_deltas The force deltas for x0 y0 z0
+ * @param _x1_y0_z0_force_deltas The force deltas for x1 y0 z0
+ * @param _x0_y1_z0_force_deltas The force deltas for x0 y1 z0
+ * @param _x1_y1_z0_force_deltas The force deltas for x1 y1 z0
+ * @param _x0_y0_z1_force_deltas The force deltas for x0 y0 z1
+ * @param _x1_y0_z1_force_deltas The force deltas for x1 y0 z1
+ * @param _x0_y1_z1_force_deltas The force deltas for x0 y1 z1
+ * @param _x1_y1_z1_force_deltas The force deltas for x1 y1 z1
+ */
 inline void
 interpolate_box(double _force_deltas[3], const double _pos[3], const double _d_pos[3],
                 const double _x0_y0_z0_force_deltas[3], const double _x1_y0_z0_force_deltas[3],
@@ -54,20 +91,27 @@ interpolate_box(double _force_deltas[3], const double _pos[3], const double _d_p
   interpolate_line(_force_deltas, _pos[2], _d_pos[2], z0_force_deltas, z1_force_deltas);
 }
 
-/*
-_force_deltas[x][y][z] is a 3-tuple of force deltas
-_position_deltas is a 3-tuple of (dx, dy, dz)
-_num_bins is a 3-tuple of (max_x_bin, max_y_bin, max_z_bin)
-*/
+/**
+ * @brief Given some position, find the proper bin and
+ * trilinearly interpolate with the 8 nearest points.
+ * @param _force_deltas Where the results are stored
+ * @param _pos The GLOBAL position (not relative!)
+ * @param _minimal_pos The smallest edge of the simulation box
+ * @param _nodes _nodes[x_index][y_index][z_index] is the
+ * 3-tuple of force deltas at the given dimensional indices.
+ * @param _position_deltas The "bin widths" between nodes
+ * @param _num_nodes The count of nodes on each side
+ */
 inline void interpolate(double _force_deltas[3], const double _pos[3], const double _minimal_pos[3],
                         const double *const *const *const *const _nodes,
-                        const double _position_deltas[3], const uint _num_nodes[3])
+                        const double _position_deltas[3], const unsigned int _num_nodes[3])
 {
   // Determine bin ids
   int x_bin = (int) ((_pos[0] - _minimal_pos[0]) / _position_deltas[0]);
   int y_bin = (int) ((_pos[1] - _minimal_pos[1]) / _position_deltas[1]);
   int z_bin = (int) ((_pos[2] - _minimal_pos[2]) / _position_deltas[2]);
 
+  // Handle edge cases to avoid segfaults
   if (x_bin < 0) {
     x_bin = 0;
   } else if (x_bin + 1 >= _num_nodes[0]) {

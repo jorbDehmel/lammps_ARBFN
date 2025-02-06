@@ -163,6 +163,16 @@ mpirun -n 1 wall_effect.out : \
 
 ---
 
+# Future work
+
+- Test on supercomputer scale
+- Add special case for occasionally updating force fields
+    (mixing `fix arbfn` and `fix arbfn/ffield`)
+- Enforce compliance with `LAMMPS` package best practice
+    guidelines
+
+---
+
 # Gallery
 
 ---

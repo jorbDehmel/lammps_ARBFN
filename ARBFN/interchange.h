@@ -13,7 +13,7 @@
 #include <random>
 #include <thread>
 
-#define FIX_ARBFN_VERSION "0.1.4"
+#define FIX_ARBFN_VERSION "0.2.0"
 
 /**
  * @brief The color all ARBFN comms will be expected to have
