@@ -264,8 +264,12 @@ The `ARBFN` package also provides the `arbfn/ffield` fix, shown
 below.
 
 ```lammps
-fix name_1 all arbfn/ffield
+fix name_1 all arbfn/ffield 100 200 400
 ```
+
+Where the number of $x$ **bins** is $100$ (meaning $101$ nodes),
+the number of $y$ bins is $200$, and the number of $z$ bins is
+$400$.
 
 ## `fix arbfn/ffield` Protocol
 

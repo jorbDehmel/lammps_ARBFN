@@ -11,6 +11,7 @@ log.*
 *.bbl
 *.blg
 *.log
+*.listing
 
 _minted-main/
 ARBFN/.clangd
