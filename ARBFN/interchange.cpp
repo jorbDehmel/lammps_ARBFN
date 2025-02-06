@@ -238,21 +238,21 @@ void send_deregistration(const int &_controller_rank, MPI_Comm &_comm)
  * @brief Interchange, but for ffield fixes. This only happens once, upon simulation initialization.
  * @param _start A 3-tuple (x, y, z) of the lowest corner of the simulation box.
  * @param _bin_widths A 3-tuple for the x, y, and z spacing of the nodes.
- * @param _bin_counts The number of bins per side. A 3-tuple of the x, y, and z.
+ * @param _node_counts The number of nodes per side. A 3-tuple of the x, y, and z.
  * @param _controller_rank The rank of the controller within the provided communicator
  * @param _comm The MPI communicator to use
  * @returns A std::list of the data to be added
  */
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
-                                             const uint _bin_counts[3],
+                                             const uint _node_counts[3],
                                              const uint &_controller_rank, MPI_Comm &_comm)
 {
   boost::json::object to_send;
 
   to_send["type"] = "gridRequest";
-  to_send["start"] = boost::json::array({_start[0], _start[1], _start[2]});
-  to_send["binWidths"] = boost::json::array({_bin_widths[0], _bin_widths[1], _bin_widths[2]});
-  to_send["binCounts"] = boost::json::array({_bin_counts[0], _bin_counts[1], _bin_counts[2]});
+  to_send["offset"] = boost::json::array({_start[0], _start[1], _start[2]});
+  to_send["spacing"] = boost::json::array({_bin_widths[0], _bin_widths[1], _bin_widths[2]});
+  to_send["nodeCounts"] = boost::json::array({_node_counts[0], _node_counts[1], _node_counts[2]});
 
   std::stringstream to_send_strm;
   to_send_strm << to_send;
@@ -272,7 +272,7 @@ std::list<FFieldNodeData> ffield_interchange(const double _start[3], const doubl
   // array of points
   std::list<FFieldNodeData> out;
 
-  const auto points = response.at("points").as_array();
+  const auto points = response.at("nodes").as_array();
   for (const auto &point : points) {
     FFieldNodeData to_add;
     to_add.x_index = point.at("xIndex").as_int64();

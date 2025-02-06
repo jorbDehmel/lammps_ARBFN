@@ -15,6 +15,8 @@ LAMMPS_NS::FixArbFnFField::FixArbFnFField(class LAMMPS *_lmp, int _c, char **_v)
   max_ms = 0.0;
 
   if (_c < 6) { error->all(FLERR, "Malformed `fix arbfn/ffield': Missing x/y/z bin counts."); }
+
+  double bin_counts[3];
   bin_counts[0] = utils::numeric(FLERR, _v[3], false, _lmp);
   bin_counts[1] = utils::numeric(FLERR, _v[4], false, _lmp);
   bin_counts[2] = utils::numeric(FLERR, _v[5], false, _lmp);
@@ -82,7 +84,7 @@ void LAMMPS_NS::FixArbFnFField::init()
 
   // Populate bins from controller here
   const auto points =
-      ffield_interchange(lmp->domain->boxlo, bin_deltas, bin_counts, controller_rank, comm);
+      ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts, controller_rank, comm);
 
   for (const auto &p : points) {
     if (p.x_index >= node_counts[0]) {

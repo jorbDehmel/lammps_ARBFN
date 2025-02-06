@@ -77,7 +77,7 @@ struct FFieldNodeData {
  * @brief Interchange, but for ffield fixes. This only happens once, upon simulation initialization.
  * @param _start A 3-tuple (x, y, z) of the lowest corner of the simulation box.
  * @param _bin_widths A 3-tuple for the x, y, and z spacing of the nodes.
- * @param _bin_counts The number of bins per side. A 3-tuple of the x, y, and z.
+ * @param _node_counts The number of nodes per side. A 3-tuple of the x, y, and z.
  * @param _controller_rank The rank of the controller within the provided communicator
  * @param _comm The MPI communicator to use
  * @returns A std::list of the data to be added

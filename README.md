@@ -314,11 +314,11 @@ perspective.
             the server loop. This is the only case in which the
             server shuts down.
         - If `"type"` is the string `"gridRequest"`, the JSON
-            will have the values `"start"` (the x/y/z box
-            starting coordinates), `"binWidth"` (the dx/dy/dz
-            between nodes in space), and `"binCounts"` (the
-            number of bins per size). It will expect a return
-            value of an object with `"points"` being an array.
+            will have the values `"offset"` (the x/y/z box
+            starting coordinates), `"spacing"` (the dx/dy/dz
+            between nodes in space), and `"nodeCounts"` (the
+            number of nodes per side). It will expect a return
+            value of an object with `"nodes"` being an array.
             Each item of `"points"` must have attributes
             `xIndex`, `yIndex`, `zIndex` (the bin indices),
             `dfx`, `dfy`, and `dfz` (the force field

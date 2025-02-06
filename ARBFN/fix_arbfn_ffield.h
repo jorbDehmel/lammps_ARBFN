@@ -56,8 +56,6 @@ class FixArbFnFField : public Fix {
   double max_ms;
   MPI_Comm comm;
   bool is_dipole = false;
-
-  uint bin_counts[3];
   uint node_counts[3];
 
   double bin_deltas[3];
