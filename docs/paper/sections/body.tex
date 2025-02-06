@@ -1,0 +1,42 @@
+
+\subsection{\texttt{fix arbfn}}
+
+\end{multicols}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{arbfn_protocol}
+    \caption{\texttt{fix arbfn} protocol.}
+    \label{fig:arbfn_protocol}
+\end{figure}
+\begin{multicols}{2}
+
+\subsection{\texttt{fix arbfn/ffield}}
+
+\end{multicols}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{ffield_protocol}
+    \caption{\texttt{fix arbfn/ffield} protocol.}
+    \label{fig:ffield_protocol}
+\end{figure}
+\begin{multicols}{2}
+
+Although the difference between \ref{fig:arbfn_protocol} and
+\ref{fig:ffield_protocol} may seem trivial, the omission of the
+controller from the simulation loop allows
+\ref{fig:ffield_protocol} to run orders of magnitude faster.
+
+\subsection{Running Simulations}
+
+In order to keep ARBFN MPI communication from interfering with
+internal LAMMPS communication, we must run LAMMPS with the
+\texttt{-mpicolor ...} command-line argument. The number
+following this must be anything \textbf{except $56789$}. On
+Linux systems, this takes the form that follows.
+
+\begin{code}
+mpirun -n 1 ./controller : \
+    -n ${num_lmp_threads} \
+    lmp -mpicolor 123 \
+    -in input_script.lmp
+\end{code}

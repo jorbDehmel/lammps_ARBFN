@@ -50,15 +50,45 @@
 % \doublespacing
 % END DRAFT SECTION
 
-\graphicspath{.}
+\graphicspath{{figures}}
 \geometry{letterpaper}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 
 \begin{document}
+
+    % Contains title and abstract
     \input{sections/titlepage.tex}
 
     \begin{multicols}{2}
+
+        \section{Introduction} \label{intro}
+
+        \input{sections/intro.tex}
+
+        \section{Related Work} \label{related}
+
+        \input{sections/related.tex}
+
+        \section{Details} \label{body}
+
+        \input{sections/body.tex}
+
+        \section{Performance Testing} \label{performance}
+
+        \input{sections/performance.tex}
+
+        \section{Future Work} \label{future_work}
+
+        \input{sections/future_work.tex}
+
+        \section{Conclusion} \label{conclusion}
+
+        \input{sections/conclusion.tex}
+
+        \section{Acknowledgements}
+
+        \input{sections/ack.tex} \label{ack}
 
         \bibliographystyle{plain}
         \bibliography{refs}

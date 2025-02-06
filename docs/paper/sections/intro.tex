@@ -1,0 +1,34 @@
+
+% Motivation
+
+% Bird's eye view
+
+% Restrictions and solutions thereof
+
+% Final LAMMPS interface
+Our final \texttt{LAMMPS} interface for \texttt{fix arbfn} is
+exemplified by the following.
+
+\lstset{language=bash}
+\begin{code}
+# Every timestep, send all atomic data and
+# receive fix data.  If the controller
+# takes longer than 50 ms to respond, error.
+fix name_1 all arbfn maxdelay 50.0
+
+# Every 100 timesteps, send all atomic data
+# without expecting any fix data back.
+fix name_2 all arbfn every 100 dumponly
+\end{code}
+
+Likewise, \texttt{fix arbfn/ffield} is shown below.
+\begin{code}
+# At initialization, retrieve a mesh of 101
+# by 201 by 301 nodes. Every timestep,
+# perform trilinear interpolation of the
+# received force field.
+fix name_3 all arbfn/ffield 100 200 300
+\end{code}
+
+More about the implementation of these fixes will be given in
+section \ref{body}.
