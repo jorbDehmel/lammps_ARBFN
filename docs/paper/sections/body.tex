@@ -1,6 +1,36 @@
 
 \subsection{\texttt{fix arbfn}}
 
+% Description
+The first fix provided by the package is \texttt{fix arbfn}. It
+is the most powerful and slowest. Every time this fix is called,
+its atoms are sent off to the controller over MPI. The
+controller then determines some amount of force to add to each
+atom, sending it back to LAMMPS to implement. The controller is
+also allowed to send a "waiting" packet indicating that LAMMPS
+should wait another few milliseconds. If no response is received
+within some specified time limit, LAMMPS will error. Since there
+may be arbitrarily many LAMMPS instances running, the controller
+may choose to await all the data or to send back data
+immediately. It is slightly faster to send back data one
+controller at a time, but limits the capabilities of the fix
+(for instance, a fix pushing atoms towards the center of mass
+could not be implemented).
+
+% Use case
+This fix can be used to implement frame-by-frame control of the
+forces of atoms based on the state of some external system. As
+a frivolous example, imagine a LAMMPS simulation where forces
+could be applied by using a physical joystick. It can also be
+used to apply forces based on attributes not feasibly
+implementable solely within LAMMPS.
+
+% Protocol
+The protocol for \texttt{fix arbfn} is shown below. Note that
+communication between LAMMPS and the "worker" (fix object
+instance) is virtually free, while communication between the
+worker and the controller is very expensive.
+
 \end{multicols}
 \begin{figure}[H]
     \centering
@@ -10,7 +40,30 @@
 \end{figure}
 \begin{multicols}{2}
 
+% Evaluation
+While necessary for some use cases, this fix is painfully slow:
+A simulation that may take only a few minutes without it will
+instead take hours.
+
 \subsection{\texttt{fix arbfn/ffield}}
+
+% Description
+Evolving from the aforementioned MPI delays is the
+\texttt{arbfn/ffield} fix. This takes in some spatial grid of
+nodes at instantiation via MPI, then interpolates between them
+to find specific force field values.
+
+% Use case
+This fix is not able to update frame-by-frame, and the
+interpolation it does is position-only (velocity, existing
+force, and orientation cannot come into play), but is in
+exchange about 100 times faster.
+
+% Protocol
+The protocol for the \texttt{arbfn/ffield} fix is shown below.
+Note that there are no longer costly MPI calls within the
+simulation loop, and thus the simulation will perform much
+better.
 
 \end{multicols}
 \begin{figure}[H]
@@ -21,9 +74,10 @@
 \end{figure}
 \begin{multicols}{2}
 
-Although the difference between \ref{fig:arbfn_protocol} and
-\ref{fig:ffield_protocol} may seem trivial, the omission of the
-controller from the simulation loop allows
+% Evaluation
+Although the difference between figures \ref{fig:arbfn_protocol}
+and \ref{fig:ffield_protocol} may seem trivial, the omission of
+the controller from the simulation loop allows
 \ref{fig:ffield_protocol} to run orders of magnitude faster.
 
 \subsection{Running Simulations}

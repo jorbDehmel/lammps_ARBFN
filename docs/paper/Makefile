@@ -1,10 +1,10 @@
-SECTIONS = abstract ack body conclusion future_work intro \
-	performance related titlepage
+SECTIONS = abstract ack body conclusion intro performance \
+	related titlepage
 FIGURES = figures/arbfn_protocol.png figures/ffield_protocol.png
 
 main.pdf:	main.tex refs.bib $(SECTIONS:%=sections/%.tex) $(FIGURES)
 	pdflatex -shell-escape $<
-	# bibtex main.aux
+	bibtex main.aux
 	pdflatex -shell-escape $<
 	pdflatex -shell-escape $<
 

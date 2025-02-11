@@ -1,2 +1,44 @@
 
-% TODO: Once finalized, add performance tests
+% Setup
+Our performance experiments were carried out with small
+simulations. We kept a constant particle density of 2 atoms per
+unit area in a 2D system (where the square box's edge length was
+varied) to avoid minimization problems arising from varying
+particle directly. These experiments are intended to demonstrate
+the trend of the running times in small simulations, as well as
+to corroborate that our fixes scale proportionally to a no-fix
+system. A \texttt{Python} script was used to automate the
+running of scripts.
+
+\end{multicols}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{arbfn_comparison}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{
+            arbfn_scaled_comparison}
+    \end{subfigure}
+
+    \caption{
+        Comparing \texttt{fix arbfn} to control and
+        \texttt{fix arbfn/ffield}. While still linear, it runs
+        \emph{much} slower than the latter two (which are about
+        the same speed).
+    }
+    \label{fig:arbfn_comparison}
+\end{figure}
+\begin{multicols}{2}
+
+% Results
+Figure \ref{fig:arbfn_comparison} demonstrates the sharp slope
+of \texttt{fix arbfn}: IPC is extremely costly, and
+frame-by-frame updates should be avoided whenever possible. That
+being said, the time usage appears to scale proportionally to
+control as expected. The \texttt{fix arbfn/ffield} results
+appear to scale with a much smaller coefficient, as expected:
+This is a much more usable fix, although its usecase is more
+narrow.

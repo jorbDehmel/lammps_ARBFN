@@ -5,6 +5,7 @@
         "bitshift",
         "cypher",
         "Dehmel",
+        "discardable",
         "journaling",
         "LAMMPS",
         "multicore",

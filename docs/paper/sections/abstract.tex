@@ -8,7 +8,8 @@ possibly lead to their mitigation or control. In this case, the
 addition of arbitrary force fields onto the simulation space
 would be useful. This project introduces an
 externally-controlled arbitrary atomic forcing fix for LAMMPS
-within the existing MPI framework. This involves an
+within the existing MPI framework \cite{modifying-lammps}
+\cite{mpi-docs} \cite{lammps-docs}. This involves an
 arbitrary-language controller program being instantiated
 alongside LAMMPS in an MPI runtime, then communicating with all
 LAMMPS instances whenever the desired fix must be computed. The

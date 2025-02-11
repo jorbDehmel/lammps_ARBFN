@@ -1,9 +1,45 @@
 
 % Motivation
+LAMMPS fixes are powerful, but sometimes insufficient. Although
+modifying LAMMPS' source code allows efficient implementation of
+arbitrary fixes, it requires a technical background and
+\texttt{C++} to be the language used. Especially when working
+with heavyweight or language-specific systems, it would be far
+easier to write fixes externally. Thus, we have developed a
+system for external force fixes as functions of the entire
+simulated system. Furthermore, in cases where such
+inter-process communication heavy computation would be overkill,
+we provide a custom externally-determined forcing field.
 
 % Bird's eye view
+If we want to have an external system act as a ``controller''
+over our LAMMPS particles, we will need to define a
+\texttt{C++ fix} class which can then be applied in scripts.
+Instances of this class will need to be able to communicate
+externally: The easiest way to do this is via the Message
+Passing Interface (MPI), which LAMMPS already uses. These
+``workers'' will send MPI packets to the controller whenever
+they need an update, then receiving a result and applying it.
+For readability and encoding-independence, we will send packets
+using JavaScript Object Notation (JSON). To avoid gridlock, we
+will allow the user to specify a maximal time to await
+controller response before an error is thrown.
 
-% Restrictions and solutions thereof
+We will call this fix type \textbf{\texttt{fix arbfn}} (for
+``arbitrary function'' of the state of the simulation).
+
+Note: JSON incurs overhead cost proportional to the size of the
+message because of its syntax. It would be faster and smaller to
+send raw encodings of the values used, at the cost of imposing
+additional restrictions upon the controller language. Thus, we
+have chosen to pay the overhead for JSON.
+
+In the aforementioned special cases wherein constant MPI
+communication is unnecessary, we will also define the
+\textbf{\texttt{arbfn/ffield}} fix, which determines a static
+force field via MPI communication at instantiation, then
+trilinearly interpolating atom positions onto a finite grid in
+order to find their forcing values at runtime.
 
 % Final LAMMPS interface
 Our final \texttt{LAMMPS} interface for \texttt{fix arbfn} is
