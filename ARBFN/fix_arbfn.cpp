@@ -19,13 +19,13 @@ LAMMPS_NS::FixArbFn::FixArbFn(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp,
 
     if (strcmp(arg, "maxdelay") == 0) {
       if (i + 1 >= _c) {
-        error->all(FLERR, "Malformed `fix arbfn': Missing argument for `maxdelay'.");
+        error->universe_one(FLERR, "Malformed `fix arbfn': Missing argument for `maxdelay'.");
       }
       max_ms = utils::numeric(FLERR, _v[i + 1], false, _lmp);
       ++i;
     } else if (strcmp(arg, "every") == 0) {
       if (i + 1 >= _c) {
-        error->all(FLERR, "Malformed `fix arbfn': Missing argument for `every'.");
+        error->universe_one(FLERR, "Malformed `fix arbfn': Missing argument for `every'.");
       }
       every = utils::numeric(FLERR, _v[i + 1], false, _lmp);
       ++i;
@@ -36,7 +36,8 @@ LAMMPS_NS::FixArbFn::FixArbFn(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp,
     }
 
     else {
-      error->all(FLERR, "Malformed `fix arbfn': Unknown keyword `" + std::string(arg) + "'.");
+      error->universe_one(FLERR,
+                          "Malformed `fix arbfn': Unknown keyword `" + std::string(arg) + "'.");
     }
   }
 }
@@ -51,7 +52,8 @@ void LAMMPS_NS::FixArbFn::init()
 {
   bool res = send_registration(controller_rank, comm);
   if (!res) {
-    error->all(FLERR, "`fix arbfn' failed to register with controller: Ensure it is running.");
+    error->universe_one(FLERR,
+                        "`fix arbfn' failed to register with controller: Ensure it is running.");
   }
 
   counter = 0;
@@ -110,7 +112,7 @@ void LAMMPS_NS::FixArbFn::post_force(int)
   // Transmit atoms, receive fix data
   FixData *to_recv = new FixData[n];
   success = interchange(n, to_send.data(), to_recv, max_ms, controller_rank, comm, expect_response);
-  if (!success) { error->all(FLERR, "`fix arbfn' failed interchange."); }
+  if (!success) { error->universe_one(FLERR, "`fix arbfn' failed interchange."); }
   if (!expect_response) { return; }
 
   // Translate FixData struct to LAMMPS force info

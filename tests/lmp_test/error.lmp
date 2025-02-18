@@ -1,3 +1,4 @@
+# Intentionally causes errors
 units lj
 dimension 2
 atom_style atomic
@@ -17,11 +18,12 @@ minimize 1.0e-4 1.0e-6 1000 10000
 fix mynve all nve
 fix myefn all enforce2d
 
-fix myarbfn all arbfn/ffield 100 100 2
+# fix myarbfn all arbfn/ffield
 # fix myarbfn all arbfn maxdelay 50.0
 
-dump mov all movie 1000 movie.avi type type
-
 reset_timestep 0
-timestep 0.005
+
+# Extremely large timestep to try to lose atoms
+timestep 0.1
+
 run 40000

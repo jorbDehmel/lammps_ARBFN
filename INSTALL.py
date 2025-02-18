@@ -97,7 +97,8 @@ def main() -> int:
                 '../cmake'], check=True)
 
         # Compile executable
-        sp.run(['make'], check=True)
+        num_threads: int = int(input('Number of threads (int): '))
+        sp.run(['make', '-j', str(num_threads)], check=True)
 
         # Install executable
         exe_source: str = path.join(build_dir, 'lmp')

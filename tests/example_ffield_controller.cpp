@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <mpi.h>
 #include <sstream>
 #include <string>
@@ -29,7 +30,15 @@ int main()
   MPI_Init(NULL, NULL);
   MPI_Comm_split(MPI_COMM_WORLD, 0, 0, &junk_comm);
   MPI_Comm_split(MPI_COMM_WORLD, 56789, 0, &comm);
+
+  MPI_Request ibarrier_request;
+  MPI_Ibarrier(MPI_COMM_WORLD, &ibarrier_request);
+
   do {
+    int flag = 0;
+    MPI_Test(&ibarrier_request, &flag, MPI_STATUS_IGNORE);
+    if (flag) { break; }
+
     MPI_Status status;
     MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &status);
     char *const buffer = new char[status._ucount + 1];
@@ -46,6 +55,7 @@ int main()
       auto raw = s.str();
       MPI_Send(raw.c_str(), raw.size(), MPI_CHAR, status.MPI_SOURCE, 0, comm);
     } else if (json["type"] == "deregister") {
+      std::cout << "Deregistered a worker\n" << std::flush;
       --num_registered;
     }
 
@@ -108,7 +118,7 @@ int main()
 
     // Everything after this is just like `fix arbfn`
   } while (num_registered != 0);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Wait(&ibarrier_request, MPI_STATUS_IGNORE);
   MPI_Comm_free(&comm);
   MPI_Comm_free(&junk_comm);
   MPI_Finalize();

@@ -14,7 +14,9 @@ LAMMPS_NS::FixArbFnFField::FixArbFnFField(class LAMMPS *_lmp, int _c, char **_v)
   // Handle keywords here
   max_ms = 0.0;
 
-  if (_c < 6) { error->all(FLERR, "Malformed `fix arbfn/ffield': Missing x/y/z bin counts."); }
+  if (_c < 6) {
+    error->universe_one(FLERR, "Malformed `fix arbfn/ffield': Missing x/y/z bin counts.");
+  }
 
   double bin_counts[3];
   bin_counts[0] = utils::numeric(FLERR, _v[3], false, _lmp);
@@ -31,7 +33,8 @@ LAMMPS_NS::FixArbFnFField::FixArbFnFField(class LAMMPS *_lmp, int _c, char **_v)
 
   for (int i = 6; i < _c; ++i) {
     const char *const arg = _v[i];
-    error->all(FLERR, "Malformed `fix arbfn/ffield': Unknown keyword `" + std::string(arg) + "'.");
+    error->universe_one(
+        FLERR, "Malformed `fix arbfn/ffield': Unknown keyword `" + std::string(arg) + "'.");
   }
 
   nodes = new double ***[node_counts[0]];
@@ -78,8 +81,8 @@ void LAMMPS_NS::FixArbFnFField::init()
 
   bool res = send_registration(controller_rank, comm);
   if (!res) {
-    error->all(FLERR,
-               "`fix arbfn/ffield' failed to register with controller: Ensure it is running.");
+    error->universe_one(
+        FLERR, "`fix arbfn/ffield' failed to register with controller: Ensure it is running.");
   }
 
   // Populate bins from controller here
@@ -88,11 +91,11 @@ void LAMMPS_NS::FixArbFnFField::init()
 
   for (const auto &p : points) {
     if (p.x_index >= node_counts[0]) {
-      error->all(FLERR, "`fix arbfn/ffield' controller sent invalid x bin.");
+      error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid x bin.");
     } else if (p.ybin >= node_counts[1]) {
-      error->all(FLERR, "`fix arbfn/ffield' controller sent invalid y bin.");
+      error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid y bin.");
     } else if (p.zbin >= node_counts[2]) {
-      error->all(FLERR, "`fix arbfn/ffield' controller sent invalid z bin.");
+      error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid z bin.");
     }
     nodes[p.x_index][p.ybin][p.zbin][0] += p.dfx;
     nodes[p.x_index][p.ybin][p.zbin][1] += p.dfy;
