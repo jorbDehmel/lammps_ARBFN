@@ -24,12 +24,16 @@ external "controller"
 
 - Controller should be as arbitrary as possible
     - **Solution**: Define only protocol, not controller
+
 - Protocol should support cross-platform communication
     - **Solution**: JSON packets over MPI
+
 - Must handle latency to avoid wasting server time
     - **Solution**: Throw error if controller isn't timely
+
 - Must assume that LAMMPS is distributed across many nodes
     - **Solution**: Use MPI, which LAMMPS already has
+
 - Must not interfere with LAMMPS' internal communication
     - **Solution**: Use MPI colors to separate communication
         channels
@@ -92,6 +96,10 @@ fix fix_name all arbfn maxdelay 50.0 every 5
 mpirun -n 1 ../example_controller.out : \
     -n 3 lmp -mpicolor 123 -in test.lmp
 ```
+
+---
+
+![](../paper/figures/arbfn_protocol.png)
 
 ---
 
@@ -160,6 +168,10 @@ mpirun -n 1 wall_effect.out : \
 - Trilinearly interpolates in $x/y/z$ space for the force deltas
 - This runs **as fast as normal LAMMPS**, while still allowing
     for arbitrary force fields
+
+---
+
+![](../paper/figures/ffield_protocol.png)
 
 ---
 
