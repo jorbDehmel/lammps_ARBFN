@@ -1,11 +1,14 @@
 
 # Todo
-- Currently hangs in error states: Make it shut down properly
 - Allow controller to die early in `arbfn/ffield` environments
 - Test and document `arbfn dumponly` flag
 - Remove `stl` dependencies
 
 # Changelog
+
+## `0.2.1` (2/27/2025)
+- Added timeout on controller side to allow them to die within
+    a set time if the workers fail
 
 ## `0.2.0` (2/6/2025)
 - Changed API of `ffield` to use node counts instead of bin

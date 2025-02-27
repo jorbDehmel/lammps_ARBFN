@@ -91,6 +91,7 @@ def main() -> int:
         os.chdir(build_dir)
 
         # Call cmake
+        print('Building LAMMPS using CMake w/ all_on, nolib, PKG-ARBFN=ON')
         sp.run(['cmake', '-C', '../cmake/presets/all_on.cmake',
                 '-C', '../cmake/presets/nolib.cmake', '-D',
                 'PKG_ARBFN=ON', '-D', 'BUILD_MPI=yes',

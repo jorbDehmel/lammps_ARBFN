@@ -2,8 +2,6 @@
 #include "interchange.h"
 #include "utils.h"
 #include <mpi.h>
-#include <string>
-#include <vector>
 
 LAMMPS_NS::FixArbFn::FixArbFn(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp, _c, _v)
 {

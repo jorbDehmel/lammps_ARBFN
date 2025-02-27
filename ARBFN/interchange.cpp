@@ -7,7 +7,7 @@
 #include <boost/json/src.hpp>
 #include <iostream>
 #include <mpi.h>
-#include <sstream>
+#include <thread>
 
 /**
  * @brief Turn a JSON object into a std::string
@@ -69,14 +69,11 @@ FixData from_json(const boost::json::value &_to_parse)
  * @brief Await an MPI packet for some amount of time, throwing an error if none arrives.
  * @param _max_ms The max number of milliseconds to wait before error
  * @param _into The `boost::json` to save the packet into
- * @param _rng Random number generator
- * @param _time_dist Uniform int range for use w/ `_rng`
  * @param _received_from Where to save the MPI source of the sender
  * @param _comm The MPI communicator to use
  * @return True on success, false on failure
  */
-bool await_packet(const double &_max_ms, boost::json::object &_into, std::random_device &_rng,
-                  std::uniform_int_distribution<uint> &_time_dist, uint &_received_from,
+bool await_packet(const double &_max_ms, boost::json::object &_into, unsigned int &_received_from,
                   MPI_Comm &_comm)
 {
   bool got_any_packet;
@@ -117,7 +114,7 @@ bool await_packet(const double &_max_ms, boost::json::object &_into, std::random
     }
 
     // Else, sleep for a bit
-    std::this_thread::sleep_for(std::chrono::microseconds(_time_dist(_rng)));
+    std::this_thread::sleep_for(std::chrono::microseconds(250));
   }
 
   // Unwrap packet
@@ -136,13 +133,12 @@ bool await_packet(const double &_max_ms, boost::json::object &_into, std::random
  * @returns true on success, false on failure
  */
 bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], const double &_max_ms,
-                 const uint &_controller_rank, MPI_Comm &_comm, const bool &_expect_response)
+                 const unsigned int &_controller_rank, MPI_Comm &_comm,
+                 const bool &_expect_response)
 {
   bool got_fix, result;
   boost::json::object json_send, json_recv;
-  std::random_device rng;
-  std::uniform_int_distribution<uint> time_dist(0, 500);
-  uint received_from;
+  unsigned int received_from;
   boost::json::array list;
   std::string to_send;
 
@@ -161,7 +157,7 @@ bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], cons
   got_fix = false;
   while (!got_fix) {
     // Await any sort of packet
-    result = await_packet(_max_ms, json_recv, rng, time_dist, received_from, _comm);
+    result = await_packet(_max_ms, json_recv, received_from, _comm);
     if (!result) {
       std::cerr << "await_packet failed\n";
       return false;
@@ -197,11 +193,9 @@ bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], cons
  * @brief Sends a registration packet to the controller.
  * @return True on success, false on error.
  */
-bool send_registration(uint &_controller_rank, MPI_Comm &_comm)
+bool send_registration(unsigned int &_controller_rank, MPI_Comm &_comm)
 {
   boost::json::object json;
-  std::random_device rng;
-  std::uniform_int_distribution<uint> time_dist(0, 500);
   std::string to_send;
   int world_size, rank;
   bool result;
@@ -218,7 +212,7 @@ bool send_registration(uint &_controller_rank, MPI_Comm &_comm)
 
   json.clear();
   do {
-    result = await_packet(10000.0, json, rng, time_dist, _controller_rank, _comm);
+    result = await_packet(10000.0, json, _controller_rank, _comm);
     if (!result) { return false; }
   } while (!json.contains("type") || json.at("type") != "ack");
 
@@ -244,8 +238,8 @@ void send_deregistration(const int &_controller_rank, MPI_Comm &_comm)
  * @returns A std::list of the data to be added
  */
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
-                                             const uint _node_counts[3],
-                                             const uint &_controller_rank, MPI_Comm &_comm)
+                                             const unsigned int _node_counts[3],
+                                             const unsigned int &_controller_rank, MPI_Comm &_comm)
 {
   boost::json::object to_send;
 

@@ -1,8 +1,11 @@
 
 # The `ARBFN` Package for LAMMPS
+
 ## Runtime Arbitrary External Forcing Functions
 
 J Dehmel, Colorado Mesa University, 2024/25
+
+![](wall_image.png){height=50%}
 
 ---
 
@@ -37,6 +40,10 @@ external "controller"
 - Must not interfere with LAMMPS' internal communication
     - **Solution**: Use MPI colors to separate communication
         channels
+
+---
+
+![](topology.png)
 
 ---
 
@@ -186,6 +193,8 @@ mpirun -n 1 wall_effect.out : \
 ---
 
 # Gallery
+
+**See local `gif`s**
 
 ---
 

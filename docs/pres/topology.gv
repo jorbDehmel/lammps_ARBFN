@@ -1,0 +1,31 @@
+digraph topology {
+    dpi=300;
+    splines=ortho;
+    node [shape=box style=rounded];
+    edge [dir=both];
+
+    label="An example cluster topology\n(Arrows are MPI communication)";
+
+    subgraph cluster_1 {
+        label="Controller node";
+
+        controller [label="Controller program" style=rounded color=red];
+        lammps_1   [label="LAMMPS instance"];
+    }
+
+    subgraph cluster_2 {
+        label="Worker 1";
+
+        lammps_2   [label="LAMMPS instance"];
+        lammps_3   [label="LAMMPS instance"];
+    }
+
+    subgraph cluster_3 {
+        label="Worker 2";
+
+        lammps_4   [label="LAMMPS instance"];
+    }
+
+    lammps_1, lammps_2, lammps_3, lammps_4
+        -> controller;
+}

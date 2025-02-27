@@ -9,7 +9,7 @@
 LAMMPS_NS::FixArbFnFField::FixArbFnFField(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp, _c, _v)
 {
   // Split comm
-  MPI_Comm_split(MPI_COMM_WORLD, ARBFN_MPI_COLOR, 0, &comm);
+  PMPI_Comm_split(MPI_COMM_WORLD, ARBFN_MPI_COLOR, 0, &comm);
 
   // Handle keywords here
   max_ms = 0.0;

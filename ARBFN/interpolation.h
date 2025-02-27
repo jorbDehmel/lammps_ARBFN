@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <cmath>
 
 /**
  * @brief Linearly interpolates the 3-tuple of force deltas

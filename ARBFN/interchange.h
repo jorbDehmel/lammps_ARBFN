@@ -6,14 +6,10 @@
 #ifndef ARBFN_INTERCHANGE_H
 #define ARBFN_INTERCHANGE_H
 
-#include <chrono>
-#include <cstddef>
 #include <list>
 #include <mpi.h>
-#include <random>
-#include <thread>
 
-#define FIX_ARBFN_VERSION "0.2.0"
+#define FIX_ARBFN_VERSION "0.2.1"
 
 /**
  * @brief The color all ARBFN comms will be expected to have
@@ -69,7 +65,7 @@ struct FixData {
  * @var FFieldNodeData::dfz The delta to be added to fz
  */
 struct FFieldNodeData {
-  uint x_index, ybin, zbin;
+  unsigned int x_index, ybin, zbin;
   double dfx, dfy, dfz;
 };
 
@@ -83,8 +79,8 @@ struct FFieldNodeData {
  * @returns A std::list of the data to be added
  */
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
-                                             const uint _bin_counts[3],
-                                             const uint &_controller_rank, MPI_Comm &_comm);
+                                             const unsigned int _bin_counts[3],
+                                             const unsigned int &_controller_rank, MPI_Comm &_comm);
 
 /**
  * @brief Send the given atom data, then receive the given fix data. This is blocking, but does not allow worker-side gridlocks.
@@ -97,7 +93,7 @@ std::list<FFieldNodeData> ffield_interchange(const double _start[3], const doubl
  * @returns true on success, false on failure
  */
 bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], const double &_max_ms,
-                 const uint &_controller_rank, MPI_Comm &_comm,
+                 const unsigned int &_controller_rank, MPI_Comm &_comm,
                  const bool &_expect_response = true);
 
 /**
@@ -106,7 +102,7 @@ bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], cons
  * @param _comm The communicator to use
  * @return True on success, false on error.
  */
-bool send_registration(uint &_controller_rank, MPI_Comm &_comm);
+bool send_registration(unsigned int &_controller_rank, MPI_Comm &_comm);
 
 /**
  * @brief Sends a deregistration packet to the controller.
