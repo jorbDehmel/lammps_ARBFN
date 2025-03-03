@@ -19,54 +19,85 @@ const static int ARBFN_MPI_COLOR = 56789;
 /**
  * @struct AtomData
  * @brief Represents a single atom to be transferred
- * @var AtomData::x The x-position of the particle
- * @var AtomData::vx The x-velocity of the particle
- * @var AtomData::fx The x-force of the particle
- * @var AtomData::y The y-position of the particle
- * @var AtomData::vy The y-velocity of the particle
- * @var AtomData::fy The y-force of the particle
- * @var AtomData::z The z-position of the particle
- * @var AtomData::vz The z-velocity of the particle
- * @var AtomData::fz The z-force of the particle
- * @var AtomData::is_dipole Whether or not mu elements should be
- * used
- * @var AtomData::mux X component of dipole moment orientation
- * @var AtomData::muy Y component of dipole moment orientation
- * @var AtomData::muz Z component of dipole moment orientation
  */
 struct AtomData {
-  double x, vx, fx;
-  double y, vy, fy;
-  double z, vz, fz;
+  /// The x-position of the particle
+  double x;
 
+  /// The x-velocity of the particle
+  double vx;
+
+  /// The x-force of the particle
+  double fx;
+
+  /// The y-position of the particle
+  double y;
+
+  /// The y-velocity of the particle
+  double vy;
+
+  /// The y-force of the particle
+  double fy;
+
+  /// The z-position of the particle
+  double z;
+
+  /// The z-velocity of the particle
+  double vz;
+
+  /// The z-force of the particle
+  double fz;
+
+  /// Whether or not mu elements should be used
   bool is_dipole = false;
-  double mux, muy, muz;
+
+  /// x component of dipole moment orientation
+  double mux;
+
+  /// y component of dipole moment orientation
+  double muy;
+
+  /// z component of dipole moment orientation
+  double muz;
 };
 
 /**
  * @struct FixData
  * @brief Represents a fix on an atom
- * @var FixData::dfx The delta to be added to fx
- * @var FixData::dfy The delta to be added to fy
- * @var FixData::dfz The delta to be added to fz
  */
 struct FixData {
-  double dfx, dfy, dfz;
+  /// The delta to be added to fx
+  double dfx;
+
+  /// The delta to be added to fy
+  double dfy;
+
+  /// The delta to be added to fz
+  double dfz;
 };
 
 /**
  * @struct FFieldNodeData
  * @brief Used for passing around FField fix nodes
- * @var FFieldNodeData::x_index The x index of the node
- * @var FFieldNodeData::y_index The y index of the node
- * @var FFieldNodeData::z_index The z index of the node
- * @var FFieldNodeData::dfx The delta to be added to fx
- * @var FFieldNodeData::dfy The delta to be added to fy
- * @var FFieldNodeData::dfz The delta to be added to fz
  */
 struct FFieldNodeData {
-  unsigned int x_index, ybin, zbin;
-  double dfx, dfy, dfz;
+  /// The x index of the node
+  unsigned int x_index;
+
+  /// The y index of the node
+  unsigned int ybin;
+
+  /// The z index of the node
+  unsigned int zbin;
+
+  /// The delta to be added to fx
+  double dfx;
+
+  /// The delta to be added to fy
+  double dfy;
+
+  /// The delta to be added to fz
+  double dfz;
 };
 
 /**

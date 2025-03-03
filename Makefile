@@ -9,6 +9,9 @@ check:
 	@echo "Checking for python3..."
 	@python3 --version > /dev/null
 
+	@echo "Checking for Doxygen..."
+	@which doxygen > /dev/null
+
 	@echo "Checking for pip..."
 	@pip --version > /dev/null
 
@@ -30,7 +33,9 @@ check:
 docs:	docs/paper/* docs/pres/*
 	$(MAKE) -C docs/paper
 	$(MAKE) -C docs/pres
-	pandoc README.md -o README.pdf
+	doxygen -q
+	$(MAKE) -C latex
+	cp latex/refman.pdf refman.pdf
 
 .PHONY:	format
 format:
@@ -41,6 +46,10 @@ format:
 
 .PHONY:	test
 test:
+	@echo "Ensuring valid documentation..."
+	doxygen -q
+
+	@echo "Running package tests..."
 	$(MAKE) -C tests $@
 
 .PHONY:	clean

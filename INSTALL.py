@@ -12,7 +12,8 @@ import subprocess as sp
 
 def main() -> int:
     '''
-    Main function
+    Run this as sudo for help installing the ARBFN package.
+    :returns: 0 on success, nonzero on failure
     '''
 
     print('This is a custom installation script for the ARBFN LAMMPS package.')

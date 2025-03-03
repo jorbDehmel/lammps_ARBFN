@@ -15,3 +15,5 @@ log.*
 
 _minted-main/
 ARBFN/.clangd
+latex/
+html/

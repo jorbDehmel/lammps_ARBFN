@@ -44,21 +44,38 @@ namespace LAMMPS_NS {
  */
 class FixArbFnFField : public Fix {
  public:
+  /// Initialize the fix
   FixArbFnFField(class LAMMPS *, int, char **);
+
+  /// Destroy the fix and signal that to the controller
   ~FixArbFnFField() override;
 
+  /// Finish initialization
   void init() override;
+
+  /// Interpolate and add force deltas
   void post_force(int) override;
+
+  /// Tell LAMMPS when to call this fix
   int setmask() override;
 
  protected:
+  /// The MPI rank of the controller
   uint controller_rank;
+
+  /// The max number of ms to await controller response
   double max_ms;
+
+  /// The MPI communicator to use
   MPI_Comm comm;
-  bool is_dipole = false;
+
+  /// The number of bins in x/y/z
   uint node_counts[3];
 
+  /// The widths of bins in x/y/z
   double bin_deltas[3];
+
+  /// Dynamically allocated nodes to interpolate between
   double ****nodes = nullptr;
 };
 }    // namespace LAMMPS_NS

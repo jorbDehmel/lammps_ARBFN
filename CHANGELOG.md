@@ -6,6 +6,11 @@
 
 # Changelog
 
+## `0.2.2` (3/3/2025)
+- Improved documentation
+- Added Doxyfile
+- Added check for documentation best practices in `make test`
+
 ## `0.2.1` (2/27/2025)
 - Added timeout on controller side to allow them to die within
     a set time if the workers fail

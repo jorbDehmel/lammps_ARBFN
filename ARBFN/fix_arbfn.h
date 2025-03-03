@@ -41,19 +41,41 @@ namespace LAMMPS_NS {
  */
 class FixArbFn : public Fix {
  public:
+  /// Initialize the fix
   FixArbFn(class LAMMPS *, int, char **);
+
+  /// Destroy the fix
   ~FixArbFn() override;
 
+  /// Finish allocation
   void init() override;
+
+  /// Retrieve and apply force deltas
   void post_force(int) override;
+
+  /// Tell LAMMPS when to call this fix
   int setmask() override;
 
  protected:
+  /// The MPI rank of the controller
   uint controller_rank;
+
+  /// The max number of ms to await a response
   double max_ms;
+
+  /// The MPI communicator to use
   MPI_Comm comm;
-  uintmax_t every, counter;
+
+  /// Call on the controller every (this many) frames
+  uintmax_t every;
+
+  /// How many frames it has been since we last updated
+  uintmax_t counter;
+
+  /// True iff we should send mu data
   bool is_dipole = false;
+
+  /// If false, dump only
   bool expect_response = true;
 };
 }    // namespace LAMMPS_NS
