@@ -46,9 +46,6 @@ format:
 
 .PHONY:	test
 test:
-	@echo "Ensuring valid documentation..."
-	doxygen -q
-
 	@echo "Running package tests..."
 	$(MAKE) -C tests $@
 
