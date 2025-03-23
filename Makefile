@@ -1,10 +1,10 @@
-CPP := mpicxx -O3 -std=c++11
 LIBS := ARBFN/interchange.o
 
 .PHONY:	check
 check:
 	@echo "Checking for libboost-json and mpicxx w/ C++11..."
-	@$(CPP) tests/example_controller.cpp -c -o /dev/null
+	@mpicxx -std=c++11 tests/assert_version.cpp \
+		-D DESIRED_VERSION=201100ULL -c -o /dev/null
 
 	@echo "Checking for python3..."
 	@python3 --version > /dev/null
@@ -12,22 +12,13 @@ check:
 	@echo "Checking for Doxygen..."
 	@which doxygen > /dev/null
 
-	@echo "Checking for pip..."
-	@pip --version > /dev/null
-
 	@echo "Checking for mpi4py..."
-	@pip list | grep mpi4py > /dev/null
-
-	@echo "Checking for autopep8..."
-	@pip list | grep autopep8 > /dev/null
+	@echo "import mpi4py" | python3
 
 	@echo "Checking for cmake..."
 	@cmake --version > /dev/null
 
-	@echo "Checking for clang-format..."
-	@clang-format --version > /dev/null
-
-	@echo "Environment is valid."
+	@echo "Environment is valid. Use ./INSTALL.py to install."
 
 .PHONY:	docs
 docs:	docs/paper/* docs/pres/*

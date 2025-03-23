@@ -1,0 +1,1 @@
+{"rule":"COMMA_THANKS","sentence":"^\\Q(Note: No thanks whatsoever to the federal executive branch)\\E$"}
