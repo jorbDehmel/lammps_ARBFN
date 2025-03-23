@@ -1,95 +1,67 @@
-\documentclass[8pt]{amsart}
-\usepackage{geometry}
-\usepackage{hyperref}
-\usepackage{minted}
+\documentclass[reprint,amsmath,amssymb,aps]{revtex4-2}
+
 \usepackage{graphicx}
-\usepackage{multicol}
-\usepackage{float}
-\usepackage{cite}
-\usepackage{amsthm}
-\usepackage{relsize}
-\usepackage{moresize}
-\usepackage{color}
-\usepackage{amssymb}
 \usepackage{subcaption}
-\usepackage[dvipsnames]{xcolor}
-\usepackage[many]{tcolorbox}
-\tcbuselibrary{listings}
-\geometry{letterpaper}
-\newtcblisting{code} {
-    listing only,
-    breakable,
-    boxrule = 1pt,
-    colframe = gray,
-    listing options = {
-    basicstyle = \ttfamily\relsize{-1},
-    breaklines = true,
-    columns = fullflexible,
-    commentstyle = \color{olive},
-    keywordstyle = \color{MidnightBlue},
-    stringstyle = \color{OliveGreen},
-    breakatwhitespace = false,
-    keepspaces = true,
-    numbersep = 5pt,
-    showspaces = false,
-    showstringspaces = false,
-    showtabs = false,
-    tabsize = 2}}
-\newtcblisting{codeoutput}{
-    listing only,
-    breakable,
-    colback = white,
-    boxrule = 1pt,
-    colframe = gray,
-    listing options = {
-    basicstyle =\ttfamily\relsize{-1},
-    breaklines = true,
-    columns = fullflexible}}
-
-% FOR DRAFTS ONLY
-% \usepackage{setspace}
-% \doublespacing
-% END DRAFT SECTION
-
 \graphicspath{{figures}}
-\geometry{letterpaper}
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
 
 \begin{document}
 
-    % Contains title and abstract
-    \input{sections/titlepage.tex}
+\title{Arbitrary Externally-Computed Force Fixes in LAMMPS (the
+    \texttt{ARBFN} Package)}
 
-    \begin{multicols}{2}
+\author{Jordan Dehmel}
+\author{Jarrod Schiffbauer}
+\affiliation{Colorado Mesa University, 1100 North Avenue,
+    Grand Junction, CO 81501-3122}
 
-        \section{Introduction} \label{intro}
+\begin{abstract}
+When dielectric colloidal Janus particles are placed in
+pseudo-2D environments, severe wall effects come into play
+complicating the measurement of bulk motility. The efficient and
+easy implementation of semi-empirical wall-effect systems in
+LAMMPS would ease the understanding of these effects and
+possibly lead to their mitigation or control. In this case, the
+addition of arbitrary force fields onto the simulation space
+would be useful. This project introduces an
+externally-controlled arbitrary atomic forcing fix for LAMMPS
+within the existing MPI framework \cite{modifying-lammps}
+\cite{mpi-docs} \cite{lammps-docs}. This involves an
+arbitrary-language controller program being instantiated
+alongside LAMMPS in an MPI runtime, then communicating with all
+LAMMPS instances whenever the desired fix must be computed. The
+protocol communicates in JSON strings and assumes no linguistic
+properties except a valid MPI implementation.
+\end{abstract}
 
-        \input{sections/intro.tex}
+\maketitle
 
-        \section{Related Work} \label{related}
+\section{Introduction} \label{intro}
+\input{sections/intro.tex}
 
-        \input{sections/related.tex}
+\section{Related Work} \label{related}
+\input{sections/related.tex}
 
-        \section{Details} \label{body}
+\section{Details} \label{body}
+\input{sections/body.tex}
 
-        \input{sections/body.tex}
+\section{Performance Testing} \label{performance}
+\input{sections/performance.tex}
 
-        \section{Performance Testing} \label{performance}
+\section{Conclusion} \label{conclusion}
+We discussed the implementation of the \texttt{ARBFN} package
+for LAMMPS, including a brief analysis of its performance as
+simulations scaled. This package allows LAMMPS fixes which are
+determined at runtime by arbitrary external ``controllers'',
+either one-and-done (\texttt{arbfn/ffield}) or frame-by-frame
+(\texttt{fix arbfn}). Initial testing shows that the former
+performs nearly as well as unmodified LAMMPS. This package is
+provided as auxiliary material with this paper.
 
-        \input{sections/performance.tex}
+\begin{acknowledgements}
+Supported by NSF grant 2126451. Based upon work partially funded
+by Colorado Mesa University.
+\end{acknowledgements}
 
-        \section{Conclusion} \label{conclusion}
-
-        \input{sections/conclusion.tex}
-
-        \section{Acknowledgements}
-
-        \input{sections/ack.tex} \label{ack}
-
-        \bibliographystyle{plain}
-        \bibliography{refs}
-
-    \end{multicols}
+\bibliography{refs}
 
 \end{document}

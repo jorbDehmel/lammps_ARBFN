@@ -12,6 +12,7 @@ log.*
 *.blg
 *.log
 *.listing
+mainNotes.bib
 
 _minted-main/
 ARBFN/.clangd

@@ -1,5 +1,4 @@
-SECTIONS = abstract ack body conclusion intro performance \
-	related titlepage
+SECTIONS = body intro performance related
 FIGURES = figures/arbfn_protocol.png figures/ffield_protocol.png
 
 main.pdf:	main.tex refs.bib $(SECTIONS:%=sections/%.tex) $(FIGURES)

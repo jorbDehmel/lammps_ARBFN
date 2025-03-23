@@ -26,19 +26,18 @@ used to apply forces based on attributes not feasibly
 implementable solely within LAMMPS.
 
 % Protocol
-The protocol for \texttt{fix arbfn} is shown below. Note that
-communication between LAMMPS and the "worker" (fix object
-instance) is virtually free, while communication between the
-worker and the controller is very expensive.
+The protocol for \texttt{fix arbfn} is shown in figure
+\ref{fig:arbfn_protocol}. Note that communication between LAMMPS
+and the "worker" (fix object instance) is virtually free, while
+communication between the worker and the controller is very
+expensive.
 
-\end{multicols}
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[width=0.95\textwidth]{arbfn_protocol}
+    \includegraphics[width=0.45\textwidth]{arbfn_protocol}
     \caption{\texttt{fix arbfn} protocol.}
     \label{fig:arbfn_protocol}
 \end{figure}
-\begin{multicols}{2}
 
 % Evaluation
 While necessary for some use cases, this fix is painfully slow:
@@ -60,19 +59,17 @@ force, and orientation cannot come into play), but is in
 exchange about 100 times faster.
 
 % Protocol
-The protocol for the \texttt{arbfn/ffield} fix is shown below.
-Note that there are no longer costly MPI calls within the
-simulation loop, and thus the simulation will perform much
-better.
+The protocol for the \texttt{arbfn/ffield} fix is shown in
+figure \ref{fig:ffield_protocol}. Note that there are no longer
+costly MPI calls within the simulation loop, and thus the
+simulation will perform much better.
 
-\end{multicols}
-\begin{figure}[H]
+\begin{figure}
     \centering
-    \includegraphics[width=0.95\textwidth]{ffield_protocol}
+    \includegraphics[width=0.45\textwidth]{ffield_protocol}
     \caption{\texttt{fix arbfn/ffield} protocol.}
     \label{fig:ffield_protocol}
 \end{figure}
-\begin{multicols}{2}
 
 % Evaluation
 Although the difference between figures \ref{fig:arbfn_protocol}
@@ -88,9 +85,9 @@ internal LAMMPS communication, we must run LAMMPS with the
 following this must be anything \textbf{except $56789$}. On
 Linux systems, this takes the form that follows.
 
-\begin{code}
+\begin{verbatim}
 mpirun -n 1 ./controller : \
     -n ${num_lmp_threads} \
     lmp -mpicolor 123 \
     -in input_script.lmp
-\end{code}
+\end{verbatim}
