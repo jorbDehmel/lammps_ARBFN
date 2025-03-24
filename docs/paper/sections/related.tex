@@ -1,7 +1,13 @@
 
 The source code of this package draws from the QMMM package
-\cite{qmmm}, the \texttt{propel/self} fix, the LAMMPS codebase
-\cite{LAMMPS} and ``Extending and Modifying LAMMPS''
-\cite{modifying-lammps}.
+\cite{qmmm} and the LAMMPS codebase \cite{LAMMPS} for the
+framework of MPI communication. It also used the
+\texttt{BROWNIAN} package and ``Extending and Modifying LAMMPS''
+\cite{modifying-lammps} as a basis for force modifications.
+
+The external interfacing of our package
+is similar to the built-in LAMMPS \texttt{python} wrapper (used
+to similar effect in e.g. \cite{do2024feedback}), but allows
+more linguistic generality.
 
 % TODO: VASTLY improve this section
