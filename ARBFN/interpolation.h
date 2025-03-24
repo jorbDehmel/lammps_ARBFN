@@ -6,7 +6,8 @@
  * @author J Dehmel, 2025. Written under MIT license.
  */
 
-#pragma once
+#ifndef ARBFN_INTERPOLATION_HPP
+#define ARBFN_INTERPOLATION_HPP
 
 /**
  * @brief Linearly interpolates the 3-tuple of force deltas
@@ -140,3 +141,5 @@ inline void interpolate(double _force_deltas[3], const double _pos[3], const dou
                   _nodes[x_bin + 1][y_bin][z_bin + 1], _nodes[x_bin][y_bin + 1][z_bin + 1],
                   _nodes[x_bin + 1][y_bin + 1][z_bin + 1]);
 }
+
+#endif
