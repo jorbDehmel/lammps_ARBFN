@@ -9,7 +9,7 @@
 #include <list>
 #include <mpi.h>
 
-#define FIX_ARBFN_VERSION "0.2.1"
+#define FIX_ARBFN_VERSION "0.3.0"
 
 /**
  * @brief The color all ARBFN comms will be expected to have
