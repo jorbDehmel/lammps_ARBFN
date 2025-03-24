@@ -9,6 +9,7 @@
     this without this package, no need to reinvent the wheel
 - Minor `ffield_interchange` API change
 - Added `ffield` "refresh every $n$" mode (`every` keyword)
+- Updated documentation accordingly
 
 ## `0.2.2` (3/3/2025)
 - Improved documentation
