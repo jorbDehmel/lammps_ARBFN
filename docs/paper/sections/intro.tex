@@ -2,7 +2,7 @@
 % Motivation
 LAMMPS fixes are powerful, but sometimes insufficient. Although
 modifying LAMMPS' source code allows efficient implementation of
-arbitrary fixes, it requires a technical background and
+arbitrary fixes, it requires a technical background and for
 \texttt{C++} to be the language used. Especially when working
 with heavyweight or language-specific systems, it would be far
 easier to write fixes externally. Thus, we have developed a
@@ -43,7 +43,7 @@ order to find their forcing values at runtime.
 
 % Final LAMMPS interface
 Our final \texttt{LAMMPS} interface for \texttt{fix arbfn} is
-exemplified by the following.
+exemplified by the following code.
 
 \begin{verbatim}
 # Every timestep, send all atomic data and
