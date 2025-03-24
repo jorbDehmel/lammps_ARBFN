@@ -77,6 +77,16 @@ class FixArbFnFField : public Fix {
 
   /// Dynamically allocated nodes to interpolate between
   double ****nodes = nullptr;
+
+  /// Call on the controller for a grid refresh every (this many) frames.
+  /// If 0, never update after instantiation.
+  uintmax_t every = 0;
+
+  /// How many frames it has been since we last updated
+  uintmax_t counter = 0;
+
+  /// True iff we should send mu data
+  bool is_dipole = false;
 };
 }    // namespace LAMMPS_NS
 

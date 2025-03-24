@@ -29,8 +29,6 @@ LAMMPS_NS::FixArbFn::FixArbFn(class LAMMPS *_lmp, int _c, char **_v) : Fix(_lmp,
       ++i;
     } else if (strcmp(arg, "dipole") == 0) {
       is_dipole = !is_dipole;
-    } else if (strcmp(arg, "dumponly") == 0) {
-      expect_response = !expect_response;
     }
 
     else {
@@ -109,9 +107,8 @@ void LAMMPS_NS::FixArbFn::post_force(int)
 
   // Transmit atoms, receive fix data
   FixData *to_recv = new FixData[n];
-  success = interchange(n, to_send.data(), to_recv, max_ms, controller_rank, comm, expect_response);
+  success = interchange(n, to_send.data(), to_recv, max_ms, controller_rank, comm);
   if (!success) { error->universe_one(FLERR, "`fix arbfn' failed interchange."); }
-  if (!expect_response) { return; }
 
   // Translate FixData struct to LAMMPS force info
   n = 0;

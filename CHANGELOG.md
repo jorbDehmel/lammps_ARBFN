@@ -1,10 +1,14 @@
 
 # Todo
-- Allow controller to die early in `arbfn/ffield` environments
-- Test and document `arbfn dumponly` flag
 - Remove `stl` dependencies
 
 # Changelog
+
+## `0.3.0` (3/24/2025)
+- **Removed** the `dumponly` flag: There are better ways to do
+    this without this package, no need to reinvent the wheel
+- Minor `ffield_interchange` API change
+- Added `ffield` "refresh every $n$" mode (`every` keyword)
 
 ## `0.2.2` (3/3/2025)
 - Improved documentation

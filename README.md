@@ -265,11 +265,16 @@ below.
 
 ```lammps
 fix name_1 all arbfn/ffield 100 200 400
+fix name_3 all arbfn/ffield 1 2 3 every 100
 ```
 
 Where the number of $x$ **bins** is $100$ (meaning $101$ nodes),
 the number of $y$ bins is $200$, and the number of $z$ bins is
-$400$.
+$400$. `every n` means that the worker will pause every $n$
+time steps to send all atomic data to the controller and refresh
+its interpolation grid. The default `every` value is $0$,
+meaning that a new grid is never requested: The first grid is
+always used instead.
 
 ## `fix arbfn/ffield` Protocol
 
@@ -326,7 +331,10 @@ perspective.
             Each item of `"points"` must have attributes
             `xIndex`, `yIndex`, `zIndex` (the bin indices),
             `dfx`, `dfy`, and `dfz` (the force field
-            contributions at that node).
+            contributions at that node). If this is not the
+            initial grid request, there will also be an
+            `"atoms"` attribute to the request, just as in
+            `fix arbfn`.
 3. Shutdown
     - After all workers have send `"deregister"` packets, LAMMPS
         will begin shutting down. This entails one final MPI
@@ -369,7 +377,11 @@ information which can be deduced from the above.
     - When an atom needs fixed, the worker will find the 8
         nearest mesh points. It will perform a trilinear
         interpolation in $(x, y, z)$ space for `dfx`, `dfy`, and
-        `dfz`, adding the results to the atom's total forces
+        `dfz`, adding the results to the atom's total forces. If
+        `every n` was specified at instantiation, we check if
+        the current time step is a multiple of $n$ **first**. If
+        it is, we refresh the interpolation grid
+        **before updating.**
 5. Deregistration and cleanup
     - Once LAMMPS is done, the fix destructor will be called.
         This method must send the deregistration packet to the
@@ -378,7 +390,10 @@ information which can be deduced from the above.
         `MPI_Barrier`, unlike the controller.
 
 When developing a controller, it is best to use the provided
-example controllers in `./tests/` as templates.
+example controllers in `./tests/` (for `Python` and `C++`) as
+templates. These contain built-in timeouts to handle cases where
+LAMMPS enters an undetected error state, and therefore avoids
+eating away valuable server time.
 
 ## Disclaimer
 

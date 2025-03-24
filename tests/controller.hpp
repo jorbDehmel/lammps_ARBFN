@@ -265,10 +265,12 @@ inline void dependent_controller(
 
 /**
  * @brief ffield controller for more efficient special cases
- * @param _get_forces Maps position (first argument) to forces
- * (second argument)
+ * @param _get_forces Maps array of atoms, flag indicating first
+ * node, and position to forces (last argument).
  */
-inline void ffield_controller(std::function<void(const double[3], double[3])> _get_forces)
+inline void ffield_controller(
+    std::function<void(const boost::json::value &, const bool &, const double[3], double[3])>
+        _get_forces)
 {
   MPI_Comm comm, junk_comm;
   uintmax_t num_registered = 0;
@@ -310,6 +312,8 @@ inline void ffield_controller(std::function<void(const double[3], double[3])> _g
       node_counts[1] = json_node_counts.at(1).as_int64();
       node_counts[2] = json_node_counts.at(2).as_int64();
       json_to_send["nodes"] = boost::json::array();
+
+      bool first_flag = true;
       for (uint x_bin = 0; x_bin < node_counts[0]; ++x_bin) {
         for (uint y_bin = 0; y_bin < node_counts[1]; ++y_bin) {
           for (uint z_bin = 0; z_bin < node_counts[2]; ++z_bin) {
@@ -324,7 +328,8 @@ inline void ffield_controller(std::function<void(const double[3], double[3])> _g
             double forces[3];
             forces[0] = forces[1] = forces[2] = 0.0;
 
-            _get_forces(pos, forces);
+            _get_forces(json["atoms"], first_flag, pos, forces);
+            first_flag = false;
 
             to_append["dfx"] = forces[0];
             to_append["dfy"] = forces[1];

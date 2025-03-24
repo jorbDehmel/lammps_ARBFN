@@ -46,7 +46,7 @@ probably be stolen from old posters/presentations)*
 - MPI registration and deregistration compose the first and last
     steps of each protocol in the extension
 
-## Protocol 1
+## Protocol 1 (`fix arbfn`)
 
 Every time step:
 
@@ -55,7 +55,7 @@ Every time step:
 
 ![](../paper/figures/arbfn_protocol.png)
 
-## Protocol 2
+## Protocol 2 (`fix arbfn/ffield`)
 
 Once at the beginning:
 
@@ -69,7 +69,7 @@ Every time step:
 
 ![](../paper/figures/ffield_protocol.png)
 
-## Protocol 3 *(Note: if done in time)*
+## Protocol 3 (`fix arbfn/ffield` w/ `every n`)
 
 Once at the beginning:
 
@@ -87,7 +87,7 @@ Every time step:
 1. Trilinearly interpolate the force deltas for every atom
 2. Apply the interpolated forces
 
-*(Note: If done in time, I will have another diagram here)*
+![](../paper/figures/ffield_every_protocol.png)
 
 ## Runtime Comparison
 
@@ -96,7 +96,13 @@ a fixed number of atom interactions:
 
 ![](../paper/figures/arbfn_scaled_comparison.png)
 
-*(Note: If done in time, protocol 3 will be added in)*
+Note 1:
+
+Note 2: Since protocol 3 allows us to arbitrarily slow down
+protocol 2, it does not make sense to include it here. It can
+be viewed as a special case where `every 0` is (and therefore is
+as fast as) protocol 2, `every 1` is about as slow as protocol
+1, and any other `every n` is somewhere in between.
 
 ## Conclusion
 
@@ -107,8 +113,6 @@ a fixed number of atom interactions:
 - Large scale testing
 - Implementation in more useful force fields (e.g. validating
     experimental data of our Florida partners)
-
-*(Note: if protocol 3 is not done in time, it will be here)*
 
 ## Acknowledgements
 

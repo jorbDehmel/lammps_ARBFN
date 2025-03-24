@@ -33,10 +33,24 @@ LAMMPS_NS::FixArbFnFField::FixArbFnFField(class LAMMPS *_lmp, int _c, char **_v)
 
   for (int i = 6; i < _c; ++i) {
     const char *const arg = _v[i];
-    error->universe_one(
-        FLERR, "Malformed `fix arbfn/ffield': Unknown keyword `" + std::string(arg) + "'.");
+
+    if (strcmp(arg, "every") == 0) {
+      if (i + 1 >= _c) {
+        error->universe_one(FLERR, "Malformed `fix arbfn': Missing argument for `every'.");
+      }
+      every = utils::numeric(FLERR, _v[i + 1], false, _lmp);
+      ++i;
+    } else if (strcmp(arg, "dipole") == 0) {
+      is_dipole = !is_dipole;
+    }
+
+    else {
+      error->universe_one(
+          FLERR, "Malformed `fix arbfn/ffield': Unknown keyword `" + std::string(arg) + "'.");
+    }
   }
 
+  // Dynalloc
   nodes = new double ***[node_counts[0]];
   for (uint x_bin = 0; x_bin < node_counts[0]; ++x_bin) {
     nodes[x_bin] = new double **[node_counts[1]];
@@ -86,6 +100,7 @@ void LAMMPS_NS::FixArbFnFField::init()
   }
 
   // Populate bins from controller here
+  // This is the first one, so we don't send any atomic data
   const auto points =
       ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts, controller_rank, comm);
 
@@ -105,6 +120,62 @@ void LAMMPS_NS::FixArbFnFField::init()
 
 void LAMMPS_NS::FixArbFnFField::post_force(int)
 {
+  // Special refresh case
+  if (every && ++counter >= every) {
+    counter = 0;
+
+    const double *const *const x = atom->x;
+    const double *const *const v = atom->v;
+    const double *const *const mu = atom->mu;
+    const int *const mask = atom->mask;
+
+    double *const *const f = atom->f;
+
+    // Move from LAMMPS atom format to AtomData struct
+    std::vector<AtomData> to_send;
+    size_t n = 0;
+    for (size_t i = 0; i < atom->nlocal; ++i) {
+      if (mask[i] & groupbit) {
+        AtomData to_add;
+        to_add.x = x[i][0];
+        to_add.y = x[i][1];
+        to_add.z = x[i][2];
+        to_add.vx = v[i][0];
+        to_add.vy = v[i][1];
+        to_add.vz = v[i][2];
+        to_add.fx = f[i][0];
+        to_add.fy = f[i][1];
+        to_add.fz = f[i][2];
+
+        to_add.is_dipole = is_dipole;
+        if (to_add.is_dipole) {
+          to_add.mux = mu[i][0];
+          to_add.muy = mu[i][1];
+          to_add.muz = mu[i][2];
+        }
+
+        to_send.push_back(to_add);
+        ++n;
+      }
+    }
+
+    const auto points = ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts,
+                                           controller_rank, comm, to_send.size(), to_send.data());
+
+    for (const auto &p : points) {
+      if (p.x_index >= node_counts[0]) {
+        error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid x bin.");
+      } else if (p.ybin >= node_counts[1]) {
+        error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid y bin.");
+      } else if (p.zbin >= node_counts[2]) {
+        error->universe_one(FLERR, "`fix arbfn/ffield' controller sent invalid z bin.");
+      }
+      nodes[p.x_index][p.ybin][p.zbin][0] += p.dfx;
+      nodes[p.x_index][p.ybin][p.zbin][1] += p.dfy;
+      nodes[p.x_index][p.ybin][p.zbin][2] += p.dfz;
+    }
+  }
+
   const double *const *const x = atom->x;
   const int *const mask = atom->mask;
   double *const *const f = atom->f;

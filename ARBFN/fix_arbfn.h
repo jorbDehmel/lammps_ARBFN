@@ -74,9 +74,6 @@ class FixArbFn : public Fix {
 
   /// True iff we should send mu data
   bool is_dipole = false;
-
-  /// If false, dump only
-  bool expect_response = true;
 };
 }    // namespace LAMMPS_NS
 

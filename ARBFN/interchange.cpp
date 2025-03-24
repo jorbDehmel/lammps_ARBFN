@@ -4,6 +4,7 @@
  */
 
 #include "interchange.h"
+#include <boost/json/array.hpp>
 #include <boost/json/src.hpp>
 #include <iostream>
 #include <mpi.h>
@@ -133,8 +134,7 @@ bool await_packet(const double &_max_ms, boost::json::object &_into, unsigned in
  * @returns true on success, false on failure
  */
 bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], const double &_max_ms,
-                 const unsigned int &_controller_rank, MPI_Comm &_comm,
-                 const bool &_expect_response)
+                 const unsigned int &_controller_rank, MPI_Comm &_comm)
 {
   bool got_fix, result;
   boost::json::object json_send, json_recv;
@@ -150,8 +150,6 @@ bool interchange(const size_t &_n, const AtomData _from[], FixData _into[], cons
 
   to_send = json_to_str(json_send);
   MPI_Send(to_send.c_str(), to_send.size(), MPI_CHAR, _controller_rank, 0, _comm);
-
-  if (!_expect_response) { return true; }
 
   // Await response
   got_fix = false;
@@ -228,18 +226,11 @@ void send_deregistration(const int &_controller_rank, MPI_Comm &_comm)
   MPI_Send(to_send.c_str(), to_send.size(), MPI_CHAR, _controller_rank, 0, _comm);
 }
 
-/**
- * @brief Interchange, but for ffield fixes. This only happens once, upon simulation initialization.
- * @param _start A 3-tuple (x, y, z) of the lowest corner of the simulation box.
- * @param _bin_widths A 3-tuple for the x, y, and z spacing of the nodes.
- * @param _node_counts The number of nodes per side. A 3-tuple of the x, y, and z.
- * @param _controller_rank The rank of the controller within the provided communicator
- * @param _comm The MPI communicator to use
- * @returns A std::list of the data to be added
- */
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
                                              const unsigned int _node_counts[3],
-                                             const unsigned int &_controller_rank, MPI_Comm &_comm)
+                                             const unsigned int &_controller_rank, MPI_Comm &_comm,
+                                             const unsigned int &_atoms_to_send_size,
+                                             const AtomData _atoms_to_send[])
 {
   boost::json::object to_send;
 
@@ -247,6 +238,13 @@ std::list<FFieldNodeData> ffield_interchange(const double _start[3], const doubl
   to_send["offset"] = boost::json::array({_start[0], _start[1], _start[2]});
   to_send["spacing"] = boost::json::array({_bin_widths[0], _bin_widths[1], _bin_widths[2]});
   to_send["nodeCounts"] = boost::json::array({_node_counts[0], _node_counts[1], _node_counts[2]});
+
+  // Optional section to send atom information
+  if (_atoms_to_send_size > 0) {
+    boost::json::array list;
+    for (size_t i = 0; i < _atoms_to_send_size; ++i) { list.push_back(to_json(_atoms_to_send[i])); }
+    to_send["atoms"] = list;
+  }
 
   std::stringstream to_send_strm;
   to_send_strm << to_send;

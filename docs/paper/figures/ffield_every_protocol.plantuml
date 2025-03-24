@@ -1,0 +1,84 @@
+@startuml ffield_every_protocol
+participant controller
+participant worker
+participant LAMMPS
+
+LAMMPS <-> controller : Calls "MPI_Init"
+
+rnote over controller
+    Call "MPI_Comm_split" on MPI_COMM_WORLD
+    to make a discardable temp controller
+end rnote
+
+rnote over controller
+    Call "MPI_Comm_split" again on MPI_COMM_WORLD
+    to create the real controller with color
+    56789
+end rnote
+
+LAMMPS -> worker : Instantiates one or more workers
+
+rnote over worker
+    Call "MPI_Comm_split" on MPI_COMM_WORLD
+    to create controller with color 56789
+endrnote
+
+worker -> controller : Registration packet
+controller -> worker : Ack packet
+
+worker -> controller : Request packet w/ node mesh data
+
+rnote over controller
+    Determine force deltas for each requested node
+end rnote
+
+controller -> worker : Response packet w/ node data
+
+rnote over worker
+    Save node data locally, prepare for interpolation
+endrnote
+
+rnote over LAMMPS
+    Once ready for simulation
+endrnote
+
+loop Update loop
+    worker -> controller : Request packet w/ node mesh and atom data
+
+    rnote over controller
+        Determine force deltas for each requested node
+    end rnote
+
+    controller -> worker : Response packet w/ node data
+
+
+    loop Simulation (n steps)
+        LAMMPS -> worker : Calls "post_force"
+
+        rnote over worker
+            Interpolate forces from atom position data
+            and precalculated nodes
+        endrnote
+
+        worker -> LAMMPS : Returns from "post_force"
+    end
+end
+
+rnote over LAMMPS
+    Once simulation has ended
+endrnote
+
+LAMMPS -> worker : Calls destructor
+worker -> controller : Deregistration packet
+destroy worker
+
+rnote over controller
+    Once all workers have deregistered
+endrnote
+
+controller <-> LAMMPS : Final "MPI_Barrier"
+destroy controller
+destroy LAMMPS
+
+skinparam dpi 300
+@enduml

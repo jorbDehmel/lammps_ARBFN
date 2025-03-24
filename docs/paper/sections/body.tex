@@ -1,5 +1,5 @@
 
-\subsection{\texttt{fix arbfn}}
+\subsection{\texttt{fix arbfn}} \label{arbfn}
 
 % Description
 The first fix provided by the package is \texttt{fix arbfn}. It
@@ -44,7 +44,7 @@ While necessary for some use cases, this fix is painfully slow:
 A simulation that may take only a few minutes without it will
 instead take hours.
 
-\subsection{\texttt{fix arbfn/ffield}}
+\subsection{\texttt{fix arbfn/ffield}} \label{ffield}
 
 % Description
 Evolving from the aforementioned MPI delays is the
@@ -77,13 +77,56 @@ and \ref{fig:ffield_protocol} may seem trivial, the omission of
 the controller from the simulation loop allows
 \ref{fig:ffield_protocol} to run orders of magnitude faster.
 
+\subsection{\texttt{fix arbfn/ffield} with \texttt{every n}}
+    \label{ffield_every}
+
+% Description
+Our final protocol addresses the holes in what
+\texttt{fix arbfn/ffield} can compute. Instead of receiving a
+single interpolation grid at the beginning and using it for the
+entire simulation, the \texttt{every n} argument allows us to
+dynamically update the grid every $n$ time steps. Specifically,
+every $n$-th time step, the worker sends all of its atomic data
+to the controller and receives a new interpolation grid in
+return.
+
+% Use case
+This protocol allows more generality at the cost of speed, while
+still being (generally) faster than \ref{arbfn}. It allows a
+degree of dependency of the force field on the atomic data (e.g.
+center of mass) which was previously impossible.
+
+% Protocol
+The protocol for \texttt{fix arbfn/ffield} with the
+\texttt{every n} argument is shown in figure
+\ref{fig:ffield_every_protocol}. Note that this reintroduces the
+costly IPC during the simulation, but is still more sparse than
+\ref{arbfn}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{ffield_every_protocol}
+    \caption{\texttt{fix arbfn/ffield} protocol when used with
+        the \texttt{every n} argument.}
+    \label{fig:ffield_every_protocol}
+\end{figure}
+
+% Evaluation
+\ref{ffield} is a special case of \ref{ffield_every} where $n$
+is larger than the length of the simulation. Internally, this is
+represented by \texttt{every 0}. The other limit case,
+\texttt{every 1}, is \emph{nearly} \ref{arbfn}: It communicates
+every frame (and therefore is at least as slow), but the atom
+forces are ultimately still interpolated according to the grid,
+rather than directly controlled.
+
 \subsection{Running Simulations}
 
 In order to keep ARBFN MPI communication from interfering with
 internal LAMMPS communication, we must run LAMMPS with the
 \texttt{-mpicolor ...} command-line argument. The number
 following this must be anything \textbf{except $56789$} (this
-color is reserved for internal package communication). On Linux
+color is reserved for internal package communication). On UNIX
 systems, this takes the form that follows.
 
 \begin{verbatim}
