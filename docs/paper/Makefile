@@ -1,12 +1,11 @@
-SECTIONS = body intro performance related
 FIGURES = figures/arbfn_protocol.png \
 	figures/ffield_protocol.png figures/ffield_every_protocol.png
 
-main.pdf:	main.tex refs.bib $(SECTIONS:%=sections/%.tex) $(FIGURES)
-	pdflatex -shell-escape $<
+main.pdf:	main.tex refs.bib $(FIGURES)
+	pdflatex $<
 	bibtex main.aux
-	pdflatex -shell-escape $<
-	pdflatex -shell-escape $<
+	pdflatex $<
+	pdflatex $<
 
 figures/%.png:	figures/%.plantuml
 	plantuml $<
