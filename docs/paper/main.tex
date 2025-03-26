@@ -6,8 +6,8 @@
 
 \begin{document}
 
-\title{ARBFN: Arbitrary Externally-Computed Force Fixes in
-    LAMMPS}
+\title{ARBFN: Arbitrary Externally-Computed Closed-Loop Force
+    Fixes in LAMMPS}
 
 \author{Jordan Dehmel}
 \author{Jarrod Schiffbauer}
@@ -21,21 +21,21 @@
     experiments: However, it is not all-encompassing. There are
     many situations in which LAMMPS alone is not sufficient and
     some external computation must be used, for example,
-    including quantum effects and machine learning control of a
-    simulation. Such situations provide some interface for a
-    specific program to apply forces on the simulated particles.
-    This project outlines the development of a generic protocol
-    for this process. Specifically, we introduce an
-    externally-controlled arbitrary atomic forcing fix within
-    the existing MPI (Message Passing Interface) LAMMPS
-    framework \cite{modifying-lammps} \cite{mpi-docs}
-    \cite{lammps-docs}. This involves an arbitrary-language
-    controller program being instantiated alongside LAMMPS in an
-    MPI runtime, then communicating with all LAMMPS instances
-    whenever the desired fix must be computed. The protocol
-    communicates in JSON (JavaScript Object Notation) strings
-    and assumes no linguistic properties beyond a valid MPI
-    implementation.
+    including quantum effects \cite{qmmm} and machine learning
+    control \cite{Rohskopf2023} of a simulation. Such situations
+    provide some custom interface for a specific program to
+    apply forces on the simulated particles. This project
+    outlines the development of a generic protocol for this
+    process. Specifically, we introduce an externally-controlled
+    arbitrary atomic forcing fix within the existing MPI
+    (Message Passing Interface) LAMMPS framework
+    \cite{mpi-docs} \cite{LAMMPS}. This involves an
+    arbitrary-language controller program being instantiated
+    alongside LAMMPS in an MPI runtime, then communicating with
+    all LAMMPS instances whenever the desired fix must be
+    computed. The protocol communicates in JSON (JavaScript
+    Object Notation) strings and assumes no controller
+    linguistic properties beyond a valid MPI implementation.
 \end{abstract}
 
 \maketitle
@@ -94,9 +94,9 @@ exemplified by the following code.
 # takes longer than 50 ms to respond, error.
 fix name_1 all arbfn maxdelay 50.0
 
-# Every 100 timesteps, send all atomic data
-# without expecting any fix data back.
-fix name_2 all arbfn every 100 dumponly
+# Every 100 timesteps, do as above with no
+# time limit
+fix name_2 all arbfn every 100
 \end{verbatim}
 
 Likewise, \texttt{fix arbfn/ffield} is shown below.
@@ -105,27 +105,16 @@ Likewise, \texttt{fix arbfn/ffield} is shown below.
 # At initialization, retrieve a mesh of 101
 # by 201 by 301 nodes. Every timestep,
 # perform trilinear interpolation of the
-# received force field.
+# received force field
 fix name_3 all arbfn/ffield 100 200 300
+
+# Every 100 timesteps, send all atom data
+# to the controller and refresh the grid
+fix name_4 all arbfn/ffield 10 10 10 every 100
 \end{verbatim}
 
 More about the implementation of these fixes will be given in
 section \ref{body}.
-
-\section{Related Work} \label{related}
-
-The source code of this package draws from the QMMM package
-\cite{qmmm} and the LAMMPS codebase \cite{LAMMPS} for the
-framework of MPI communication. It also used the
-\texttt{BROWNIAN} package and ``Extending and Modifying LAMMPS''
-\cite{modifying-lammps} as a basis for force modifications.
-
-The external interfacing of our package
-is similar to the built-in LAMMPS \texttt{python} wrapper (used
-to similar effect in e.g. \cite{do2024feedback}), but allows
-more linguistic generality.
-
-% TODO: VASTLY improve this section
 
 \section{Details} \label{body}
 
@@ -273,11 +262,14 @@ Our performance experiments were carried out with small
 simulations. We kept a constant particle density of 2 atoms per
 unit area in a 2D system (where the square box's edge length was
 varied) to avoid minimization problems arising from varying
-particle directly. These experiments are intended to demonstrate
-the trend of the running times in small simulations, as well as
-to corroborate that our fixes scale proportionally to a no-fix
-system. A \texttt{Python} script was used to automate the
-running of scripts.
+particle count directly. The controllers used were minimal so as
+to test LAMMPS performance rather than external computation
+time: Although they always applied at least some forces to some
+atoms, no significant computation was involved. These
+experiments are intended to demonstrate the trend of the running
+times in small simulations, as well as to corroborate that our
+fixes scale proportionally to a no-fix system. A \texttt{python}
+script was used to automate the running of scripts.
 
 \begin{figure*}
     \centering
@@ -293,10 +285,10 @@ running of scripts.
 
     \caption{
         Comparing \texttt{fix arbfn} to control and
-        \texttt{fix arbfn/ffield}. While still approximately
-        linear with respect to the number of atoms, it runs
-        \emph{much} slower than the latter two (which are about
-        the same speed).
+        \texttt{fix arbfn/ffield}. While still appearing linear
+        with respect to the number of atoms, it runs \emph{much}
+        slower than the latter two (which are about the same
+        speed).
     }
     \label{fig:arbfn_comparison}
 \end{figure*}
@@ -330,6 +322,32 @@ supplementary material with this paper.
 \section{Future Work} \label{future}
 
 FUTURE WORK GOES HERE
+
+\section{Related Work} \label{related}
+
+The source code of this package draws from the QMMM package
+\cite{qmmm} and the LAMMPS codebase \cite{LAMMPS} for the
+framework of MPI communication. It also used the
+\texttt{BROWNIAN} package, ``Extending and Modifying LAMMPS''
+\cite{modifying-lammps}, and \cite{chemengineering5020030} as a
+basis for force modifications. Packages like QMMM \cite{qmmm}
+and FitSNAP \cite{Rohskopf2023} use custom \texttt{C++} to
+interface with external controllers: Our package seeks to
+standardize such communication. The external interfacing of our
+package is similar to the built-in LAMMPS \texttt{python}
+wrapper (used to similar effect in e.g. \cite{do2024feedback}),
+but allows more linguistic generality. Indeed, \texttt{python}
+has proved a popular choice in the composure and control of MD
+simulations: Source \cite{balasubramanian2016extasy} uses
+template \texttt{python} scripts to control and scale
+simulations.
+
+Visualization has been hand-in-hand with control as a primary
+concern in molecular dynamics. Systems like
+\cite{koutek2002virtual} and \cite{stone2001system} allow
+hand-modification of particle forces within their systems, even
+though their concern is primarily in human-simulation interface
+rather than software-simulation.
 
 \begin{acknowledgements}
     Supported by NSF grant 2126451. Based upon work partially

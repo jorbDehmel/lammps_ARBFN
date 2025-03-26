@@ -1,3 +1,4 @@
+% Canonical book on modifying lammps
 @book{modifying-lammps,
     title = {Extending and Modifying LAMMPS Writing Your Own Source Code: A pragmatic guide to extending LAMMPS as per custom simulation requirements},
     author = {Dr. Shafat Mubin and Jichen Li},
@@ -6,6 +7,7 @@
     isbn = {9781800562264}
 }
 
+% Open MPI's documentation
 @Misc{mpi-docs,
 author =   {{The Open MPI Project}},
 title =    {Open MPI v5.0.x},
@@ -14,6 +16,7 @@ year = {2003--2025},
 version = {v5.0.x}
 }
 
+% LAMMPS' documentation
 @Misc{lammps-docs,
 author = {{Sandia Corporation}},
 title = {LAMMPS Documentation (4 Feb 2025 version)},
@@ -22,6 +25,8 @@ year = {2003--2025},
 version = {4 Feb 2025 version}
 }
 
+% LAMMPS' source code reference publication
+% (Not original publication, but what you are canonically supposed to cite)
 @Article{LAMMPS,
   author = "A. P. Thompson and H. M. Aktulga and R. Berger and
      D. S. Bolintineanu and W. M. Brown and P. S. Crozier and
@@ -37,6 +42,7 @@ version = {4 Feb 2025 version}
   doi = "10.1016/j.cpc.2021.108171"
 }
 
+% Quantum interface package
 @Misc{qmmm,
 author =   {Axel Kohlmeyer and Mariella Ippolito and Carlo Cavazzoni},
 title =    {QM/MM support library},
@@ -51,4 +57,78 @@ year = {2014},
   pages={1065--1070},
   year={2024},
   organization={IEEE}
+}
+
+% A VR thing for MD: Lovely!
+@inproceedings{koutek2002virtual,
+  title={Virtual Spring Manipulators for Particle Steering in Molecular Dynamics on the ResponsiveWorkbench.},
+  author={Koutek, Michal and van Hees, Jeroen and Post, Frits H and Bakker, AF and others},
+  booktitle={EGVE},
+  pages={53--62},
+  year={2002}
+}
+
+% External control in MD simulation, but not LAMMPS (I think?)
+@article{10.1093/bioinformatics/bty484,
+    author = {Irrgang, M Eric and Hays, Jennifer M and Kasson, Peter M},
+    title = {gmxapi: a high-level interface for advanced control and extension of molecular dynamics simulations},
+    journal = {Bioinformatics},
+    volume = {34},
+    number = {22},
+    pages = {3945-3947},
+    year = {2018},
+    month = {06},
+    abstract = {Molecular dynamics simulations have found use in a wide variety of biomolecular applications, from protein folding kinetics to computational drug design to refinement of molecular structures. Two areas where users and developers frequently need to extend the built-in capabilities of most software packages are implementing custom interactions, for instance biases derived from experimental data, and running ensembles of simulations. We present a Python high-level interface for the popular simulation package GROMACS that i) allows custom potential functions without modifying the simulation package code, ii) maintains the optimized performance of GROMACS and iii) presents an abstract interface to building and executing computational graphs that allows transparent low-level optimization of data flow and task placement. Minimal dependencies make this integrated API for the GROMACS simulation engine simple, portable and maintainable. We demonstrate this API for experimentally-driven refinement of protein conformational ensembles.LGPLv2.1 source and instructions are available at https://github.com/kassonlab/gmxapi.Supplementary data are available at Bioinformatics online.},
+    issn = {1367-4803},
+    doi = {10.1093/bioinformatics/bty484},
+    url = {https://doi.org/10.1093/bioinformatics/bty484},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/34/22/3945/48921266/bioinformatics\_34\_22\_3945.pdf},
+}
+
+% More VR MD simulations (not LAMMPS) that offer interactive forcing
+@inproceedings{stone2001system,
+  title={A system for interactive molecular dynamics simulation},
+  author={Stone, John E and Gullingsrud, Justin and Schulten, Klaus},
+  booktitle={Proceedings of the 2001 symposium on Interactive 3D graphics},
+  pages={191--194},
+  year={2001}
+}
+
+% Scripting and templating in MD simulations
+@inproceedings{balasubramanian2016extasy,
+  title={Extasy: Scalable and flexible coupling of md simulations and advanced sampling techniques},
+  author={Balasubramanian, Vivekanandan and Bethune, Iain and Shkurti, Ardita and Breitmoser, Elena and Hruska, Eugen and Clementi, Cecilia and Laughton, Charles and Jha, Shantenu},
+  booktitle={2016 IEEE 12th International Conference on e-Science (e-Science)},
+  pages={361--370},
+  year={2016},
+  organization={IEEE}
+}
+
+% A good article on extending LAMMPS
+@Article{chemengineering5020030,
+AUTHOR = {Albano, Andrea and le Guillou, Eve and Danzé, Antoine and Moulitsas, Irene and Sahputra, Iwan H. and Rahmat, Amin and Duque-Daza, Carlos Alberto and Shang, Xiaocheng and Ching Ng, Khai and Ariane, Mostapha and Alexiadis, Alessio},
+TITLE = {How to Modify LAMMPS: From the Prospective of a Particle Method Researcher},
+JOURNAL = {ChemEngineering},
+VOLUME = {5},
+YEAR = {2021},
+NUMBER = {2},
+ARTICLE-NUMBER = {30},
+URL = {https://www.mdpi.com/2305-7084/5/2/30},
+ISSN = {2305-7084},
+ABSTRACT = {LAMMPS is a powerful simulator originally developed for molecular dynamics that, today, also accounts for other particle-based algorithms such as DEM, SPH, or Peridynamics. The versatility of this software is further enhanced by the fact that it is open-source and modifiable by users. This property suits particularly well Discrete Multiphysics and hybrid models that combine multiple particle methods in the same simulation. Modifying LAMMPS can be challenging for researchers with little coding experience. The available material explaining how to modify LAMMPS is either too basic or too advanced for the average researcher. In this work, we provide several examples, with increasing level of complexity, suitable for researchers and practitioners in physics and engineering, who are familiar with coding without been experts. For each feature, step by step instructions for implementing them in LAMMPS are shown to allow researchers to easily follow the procedure and compile a new version of the code. The aim is to fill a gap in the literature with particular reference to the scientific community that uses particle methods for (discrete) multiphysics.},
+DOI = {10.3390/chemengineering5020030}
+}
+
+% FitSNAP package: ML interface to LAMMPS
+@article{Rohskopf2023,
+doi = {10.21105/joss.05118},
+url = {https://doi.org/10.21105/joss.05118},
+year = {2023},
+publisher = {The Open Journal},
+volume = {8},
+number = {84},
+pages = {5118},
+author = {A. Rohskopf and C. Sievers and N. Lubbers and M.a. Cusentino and J. Goff and J. Janssen and M. McCarthy and D. Montes Oca de Zapiain and S. Nikolov and K. Sargsyan and D. Sema and E. Sikorski and L. Williams and A.p. Thompson and M.a. Wood},
+title = {FitSNAP: Atomistic machine learning with LAMMPS},
+journal = {Journal of Open Source Software}
 }
