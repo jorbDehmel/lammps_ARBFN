@@ -17,19 +17,19 @@
 \begin{abstract}
     The molecular dynamics simulation software LAMMPS
     (Large-scale Atomic/Molecular Massively Parallel Simulator)
-    provides a scripting language for the easy implementation of
-    experiments: However, it is not all-encompassing. There are
-    many situations in which LAMMPS alone is not sufficient and
-    some external computation must be used, for example,
-    including quantum effects \cite{qmmm} and machine learning
-    control \cite{Rohskopf2023} of a simulation. Such situations
-    provide some custom interface for a specific program to
-    apply forces on the simulated particles. This project
-    outlines the development of a generic protocol for this
-    process. Specifically, we introduce an externally-controlled
-    arbitrary atomic forcing fix within the existing MPI
-    (Message Passing Interface) LAMMPS framework
-    \cite{mpi-docs} \cite{LAMMPS}. This involves an
+    \cite{LAMMPS} provides a scripting language for the easy
+    implementation of experiments: However, it is not
+    all-encompassing. There are many situations in which LAMMPS
+    alone is not sufficient and some external computation must
+    be used (for example, quantum effects \cite{qmmm}
+    and machine learning control \cite{Rohskopf2023}). Previous
+    researchers, when confronted with these limitations, have
+    implemented custom interfaces for specific programs. This
+    project outlines the development of a generic protocol for
+    this process. Specifically, we introduce an
+    externally-controlled arbitrary atomic forcing fix within
+    the existing MPI (Message Passing Interface) LAMMPS
+    framework \cite{mpi-docs}. This involves an
     arbitrary-language controller program being instantiated
     alongside LAMMPS in an MPI runtime, then communicating with
     all LAMMPS instances whenever the desired fix must be
@@ -45,13 +45,13 @@
 % Motivation
 LAMMPS fixes are powerful, but sometimes insufficient. Although
 modifying LAMMPS' source code allows efficient implementation of
-arbitrary fixes, it requires a technical background and for
-\texttt{C++} to be the language used. Especially when working
+arbitrary fixes, it requires a technical background and imposes
+\texttt{C++} as the language of choice. Especially when working
 with heavyweight or language-specific systems, it would be far
 easier to write fixes externally. Thus, we have developed a
 system for external force fixes as functions of the entire
 simulated system. Furthermore, in cases where such
-inter-process communication heavy computation would be overkill,
+inter-process-communication-heavy computation would be overkill,
 we provide a custom externally-determined forcing field.
 
 % Bird's eye view
@@ -81,8 +81,8 @@ In the aforementioned special cases wherein constant MPI
 communication is unnecessary, we will also define the
 \textbf{\texttt{arbfn/ffield}} fix, which determines a static
 force field via MPI communication at instantiation, then
-trilinearly interpolating atom positions onto a finite grid in
-order to find their forcing values at runtime.
+trilinearly interpolating atom positions onto a finite position
+grid in order to find their forcing values at runtime.
 
 % Final LAMMPS interface
 Our final \texttt{LAMMPS} interface for \texttt{fix arbfn} is
@@ -112,9 +112,6 @@ fix name_3 all arbfn/ffield 100 200 300
 # to the controller and refresh the grid
 fix name_4 all arbfn/ffield 10 10 10 every 100
 \end{verbatim}
-
-More about the implementation of these fixes will be given in
-section \ref{body}.
 
 \section{Details} \label{body}
 
@@ -318,10 +315,6 @@ provided an option to update the interpolation force field
 as a function of atom data periodically throughout the
 simulation's life cycle. The package is provided as
 supplementary material with this paper.
-
-\section{Future Work} \label{future}
-
-FUTURE WORK GOES HERE
 
 \section{Related Work} \label{related}
 

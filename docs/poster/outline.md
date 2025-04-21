@@ -96,9 +96,7 @@ a fixed number of atom interactions:
 
 ![](../paper/figures/arbfn_scaled_comparison.png)
 
-Note 1:
-
-Note 2: Since protocol 3 allows us to arbitrarily slow down
+Note: Since protocol 3 allows us to arbitrarily slow down
 protocol 2, it does not make sense to include it here. It can
 be viewed as a special case where `every 0` is (and therefore is
 as fast as) protocol 2, `every 1` is about as slow as protocol
@@ -106,7 +104,16 @@ as fast as) protocol 2, `every 1` is about as slow as protocol
 
 ## Conclusion
 
-**TODO: WRITE THIS**
+We discussed the implementation of the `ARBFN` package for
+LAMMPS, including a brief analysis of its performance as
+simulations scaled. This package allows LAMMPS fixes which are
+determined at runtime by arbitrary external "controllers",
+either one-and-done (`arbfn/ffield`) or frame-by-frame
+(`fix arbfn`). Initial testing shows that the former performs
+nearly as well as unmodified LAMMPS, while the latter runs about
+100 times worse slower. We also provided an option to update the
+interpolation force field as a function of atom data
+periodically throughout the simulation's life cycle.
 
 ## Future Work
 

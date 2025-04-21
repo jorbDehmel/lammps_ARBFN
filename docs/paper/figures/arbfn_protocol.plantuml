@@ -1,5 +1,7 @@
 @startuml arbfn_protocol
 
+skinparam monochrome true
+
 participant controller
 participant worker
 participant LAMMPS
