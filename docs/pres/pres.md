@@ -106,7 +106,7 @@ mpirun -n 1 ../example_controller.out : \
 
 ---
 
-![](../paper/figures/arbfn_protocol.png)
+![](../arxiv/figures/arbfn_protocol.png)
 
 ---
 
@@ -178,7 +178,7 @@ mpirun -n 1 wall_effect.out : \
 
 ---
 
-![](../paper/figures/ffield_protocol.png)
+![](../arxiv/figures/ffield_protocol.png)
 
 ---
 

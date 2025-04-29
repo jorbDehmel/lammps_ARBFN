@@ -21,9 +21,10 @@ check:
 	@echo "Environment is valid. Use ./INSTALL.py to install."
 
 .PHONY:	docs
-docs:	docs/paper/* docs/pres/*
-	$(MAKE) -C docs/paper
+docs:	docs/arxiv/* docs/pres/*
+	$(MAKE) -C docs/arxiv
 	$(MAKE) -C docs/pres
+	$(MAKE) -C docs/poster
 	doxygen -q
 	$(MAKE) -C latex
 	cp latex/refman.pdf refman.pdf

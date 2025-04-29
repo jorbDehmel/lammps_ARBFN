@@ -53,7 +53,7 @@ Every time step:
 1. Send all atom data to the controller
 2. Receive and apply individualized forces
 
-![](../paper/figures/arbfn_protocol.png)
+![](../arxiv/figures/arbfn_protocol.png)
 
 ## Protocol 2 (`fix arbfn/ffield`)
 
@@ -67,7 +67,7 @@ Every time step:
 1. Trilinearly interpolate the force deltas for every atom
 2. Apply the interpolated forces
 
-![](../paper/figures/ffield_protocol.png)
+![](../arxiv/figures/ffield_protocol.png)
 
 ## Protocol 3 (`fix arbfn/ffield` w/ `every n`)
 
@@ -87,14 +87,14 @@ Every time step:
 1. Trilinearly interpolate the force deltas for every atom
 2. Apply the interpolated forces
 
-![](../paper/figures/ffield_every_protocol.png)
+![](../arxiv/figures/ffield_every_protocol.png)
 
 ## Runtime Comparison
 
 Using a set density and varying simulation box size to maintain
 a fixed number of atom interactions:
 
-![](../paper/figures/arbfn_scaled_comparison.png)
+![](../arxiv/figures/arbfn_scaled_comparison.png)
 
 Note: Since protocol 3 allows us to arbitrarily slow down
 protocol 2, it does not make sense to include it here. It can
