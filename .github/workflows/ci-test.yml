@@ -2,9 +2,9 @@ name: GitHub Actions CI/CD
 
 on:
   push:
-    branches: [ "main", "staging" ]
+    branches: [ "main", "staging", "joss" ]
   pull_request:
-    branches: [ "main", "staging" ]
+    branches: [ "main", "staging", "joss" ]
 
 permissions:
   contents: read
