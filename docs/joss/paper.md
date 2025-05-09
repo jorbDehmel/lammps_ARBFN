@@ -14,13 +14,13 @@ authors:
     orcid: 0000-0001-9791-421X
     affiliation: "1, 2"
 affiliations:
- - name: Dept of Computer Science, Colorado Mesa University, 1100 North Avenue, Grand Junction, CO 81501-3122
+ - name: Dept of Computer Science, Colorado Mesa University, Grand Junction, CO
    index: 1
    ror: 0451s5g67
- - name: Dept of Mechanical Engineering, University of Colorado Boulder, Grand Junction, Colorad
+ - name: Dept of Mechanical Engineering, University of Colorado Boulder, Grand Junction, CO
    index: 2
    ror: 02ttsq026
-date: 29 April 2025
+date: 9 May 2025
 bibliography: paper.bib
 ---
 
