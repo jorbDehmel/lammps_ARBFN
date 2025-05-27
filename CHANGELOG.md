@@ -4,6 +4,10 @@
 
 # Changelog
 
+## `0.3.1` (5/27/2025)
+- Made the `every` keyword updatable in `ffield` response
+    packets by the controller
+
 ## `0.3.0` (3/24/2025)
 - **Removed** the `dumponly` flag: There are better ways to do
     this without this package, no need to reinvent the wheel
