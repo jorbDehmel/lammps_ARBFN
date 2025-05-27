@@ -102,7 +102,7 @@ void LAMMPS_NS::FixArbFnFField::init()
   // Populate bins from controller here
   // This is the first one, so we don't send any atomic data
   const auto points =
-      ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts, controller_rank, comm);
+      ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts, controller_rank, comm, every);
 
   for (const auto &p : points) {
     if (p.x_index >= node_counts[0]) {
@@ -159,8 +159,9 @@ void LAMMPS_NS::FixArbFnFField::post_force(int)
       }
     }
 
-    const auto points = ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts,
-                                           controller_rank, comm, to_send.size(), to_send.data());
+    const auto points =
+        ffield_interchange(lmp->domain->boxlo, bin_deltas, node_counts, controller_rank, comm,
+                           every, to_send.size(), to_send.data());
 
     for (const auto &p : points) {
       if (p.x_index >= node_counts[0]) {

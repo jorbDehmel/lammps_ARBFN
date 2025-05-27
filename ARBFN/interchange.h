@@ -6,6 +6,7 @@
 #ifndef ARBFN_INTERCHANGE_H
 #define ARBFN_INTERCHANGE_H
 
+#include <cstdint>
 #include <list>
 #include <mpi.h>
 
@@ -110,6 +111,7 @@ struct FFieldNodeData {
  * @param _node_counts The number of nodes per side. A 3-tuple of the x, y, and z.
  * @param _controller_rank The rank of the controller within the provided communicator
  * @param _comm The MPI communicator to use
+ * @param _every Where to save the "every" keyword (if provided by controller)
  * @param _atoms_to_send_size (optional) If provided, the number of atoms in
  * `_atoms_to_send`. If 0, don't send any atoms.
  * @param _atoms_to_send (optional) If the size is positive, send these to the
@@ -119,6 +121,7 @@ struct FFieldNodeData {
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
                                              const unsigned int _node_counts[3],
                                              const unsigned int &_controller_rank, MPI_Comm &_comm,
+                                             uintmax_t &_every,
                                              const unsigned int &_atoms_to_send_size = 0,
                                              const AtomData _atoms_to_send[] = {});
 

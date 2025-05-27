@@ -6,6 +6,7 @@
 #include "interchange.h"
 #include <boost/json/array.hpp>
 #include <boost/json/src.hpp>
+#include <cstdint>
 #include <iostream>
 #include <mpi.h>
 #include <thread>
@@ -229,6 +230,7 @@ void send_deregistration(const int &_controller_rank, MPI_Comm &_comm)
 std::list<FFieldNodeData> ffield_interchange(const double _start[3], const double _bin_widths[3],
                                              const unsigned int _node_counts[3],
                                              const unsigned int &_controller_rank, MPI_Comm &_comm,
+                                             uintmax_t &_every,
                                              const unsigned int &_atoms_to_send_size,
                                              const AtomData _atoms_to_send[])
 {
@@ -277,6 +279,11 @@ std::list<FFieldNodeData> ffield_interchange(const double _start[3], const doubl
   }
 
   delete[] buffer;
+
+  if (response.contains("every")) {
+    // Bonus feature: We can change the interval on the fly
+    _every = response.at("every").as_uint64();
+  }
 
   return out;
 }
