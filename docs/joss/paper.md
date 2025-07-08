@@ -27,7 +27,7 @@ date: 9 May 2025
 bibliography: paper.bib
 ---
 
-# Abstract
+# Statement of Need
 
 The molecular dynamics simulation software LAMMPS
 (Large-scale Atomic/Molecular Massively Parallel Simulator)
@@ -36,7 +36,7 @@ implementation of experiments: However, it is not
 all-encompassing. There are many situations in which LAMMPS
 alone is not sufficient and some external computation must
 be used (for example, quantum effects [@qmmm]
-and machine learning control [@Rohskopf2023]. Previous
+and machine learning control [@Rohskopf2023]). Previous
 researchers, when confronted with these limitations, have
 implemented custom interfaces for specific programs. This
 project outlines the development of a generic protocol for
@@ -53,7 +53,17 @@ linguistic properties beyond a valid MPI implementation.
 
 # Introduction
 
-LAMMPS fixes are powerful, but sometimes insufficient. Although
+The molecular dynamics simulation software LAMMPS
+(Large-scale Atomic/Molecular Massively Parallel Simulator) was originally developed by a collaboration between government and industry for the direct, all-atom, simulation of materials and biomolecular properties (see for example, [@LAMMPS,@LAMMPS1,@LAMMPS2].) Since that time, LAMMPS has been extended in scale and scope to include not only atomistic simulations, but a variety of coarse-grained simulations [@LCG1,@LCG2], implicit-solvent based simulations [@LImSol], including multi-particle dissipative (Langevin) dynamics for both passive and active [@LDias, @Lcoll1,@Lcoll2] colloidal systems.
+
+Since this latter application was the original motivation for the present undertaking, a brief introduction to the underlying problem will be given here to provide context for the application of the present work, both to the simulation of active colloidal systems as well as other potential applications. For a more comprehensive overview of active matter, including experimental systems as well as the Active Brownian Particle (ABP) and other theoretical models, there are a number of reviews available [@ABJSBKGY, @ActiveRev2]. For a more pragmatic introduction to LAMMPS for the simulation of ABPs can be found in the paper by Dias [@LDias]. In brief, an active particle (or agent) is an entity which consumes energy and generates its own velocity vector locally, typically via some overall symmetry-breaking, with physical examples ranging from the microscopic, e.g., motile bacteria, synthetic swimmers, sperm cells, to the macroscopic, e.g., animals or vehicles. At the smaller scale, models for so-called active Brownian motion can be implemented by solving the equations of motion for the particles in an implicit solvent. For a system of N active particles moving in 3 dimensions, LAMMPS solves a set of 3N coupled ordinary differential equations of the Langevin type,
+
+(Include Langevin equations, 2nd order ODEs for position and orientation)
+
+Here, the ... (fill in description after above)
+This treats the solvent implicitly as a passive damping bath that viscously dissipates the motion of the particles. Typically, for low-Reynolds number motion, translational, and often rotational, inertia are ignored, and moreover, there is no straightforward way to include the hydrodynamics of the bath. In many instances, what is interesting about active matter systems is their collective behavior, e.g., emergent non-equilibrium phase-separation [@MIPPS] and anomalous fluid-like viscosity [@AnVisc] in large systems of interacting active agents. Such behavior occurs for models like the ABP model, and while modeling explicit hydrodynamic interactions between confining walls or adjacent active particles directly is possible for small systems and short times, practical simulation of collective behavior is computationally impossible. However, some important and interesting features of such interactions on the dynamics of the active particles themselves could be captured by a heuristic model for the hydrodynamic interactions, which can be implemented as a spatiotemporal modulation of the active free-space velocity of each agent, which may, for example, depend on the evolving particle density distribution itself. External forcing or other parametric inputs are required to include the effects of applied fields or to qualitatively capture the effect of complex hydrodynamic interactions. These can sometimes be facilitated by utilizing LAMMPS fixes. However, while existing LAMMPS fixes are powerful, they are sometimes insufficient. Moreover, a more generalized fix could also be implemented to permit external control of the simulation parameters, e.g., to tie spatiotemporal properties to an external and/or dynamic look-up table, or interaction with an external PINN or AI control system.
+
+Although
 modifying LAMMPS' source code allows efficient implementation of
 arbitrary fixes, it requires a technical background and imposes
 `C++` as the language of choice. Especially when working
@@ -258,6 +268,8 @@ This is a much more usable fix, although its use case is more
 narrow.
 
 # Conclusion
+
+(SOME ADDITIONS HERE, NOT MUCH)
 
 We discussed the implementation of the `ARBFN` package for
 LAMMPS, including a brief analysis of its performance as

@@ -1,6 +1,7 @@
 
 # Todo
 - Remove `stl` dependencies
+- If possible, remove `boost::json` dependency
 
 # Changelog
 
