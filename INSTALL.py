@@ -18,10 +18,6 @@ def main() -> int:
 
     print('This is a custom installation script for the ARBFN LAMMPS package.')
 
-    if os.geteuid() != 0:
-        print('Please re-run as sudo.')
-        return 1
-
     lammps_path: str = input(
         'Please enter the filepath to the `lammps` source code repository: ')
     lammps_path = path.abspath(lammps_path)
@@ -102,11 +98,14 @@ def main() -> int:
         num_threads: int = int(input('Number of threads (int): '))
         sp.run(['make', '-j', str(num_threads)], check=True)
 
-        # Install executable
-        exe_source: str = path.join(build_dir, 'lmp')
-        exe_target: str = '/usr/bin/lmp'
+        if os.geteuid() == 0:
+            # Install executable
+            exe_source: str = path.join(build_dir, 'lmp')
+            exe_target: str = '/usr/bin/lmp'
 
-        shutil.copyfile(exe_source, exe_target)
+            shutil.copyfile(exe_source, exe_target)
+        else:
+            print('Compiled, but could not copy to /usr/bin')
 
         # CD back
         os.chdir(old_path)
