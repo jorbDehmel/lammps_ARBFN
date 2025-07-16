@@ -394,7 +394,9 @@ rather than software-simulation.
 
 # Acknowledgements
 
-Supported by NSF grant 2126451. Based upon work partially
-funded by Colorado Mesa University.
+This material is based upon work supported by the National
+Science Foundation (NSF) under Grant No. 2126451, 2430509. The
+authors gratefully acknowledge the NSF's and Colorado Mesa
+University's support.​
 
 # References
