@@ -340,9 +340,9 @@ times in small simulations, as well as to corroborate that our
 fixes scale proportionally to a no-fix system. A `python`
 script was used to automate the running of scripts.
 
-![Comparing `fix arbfn` to control and `fix arbfn/ffield`. While still appearing linear with respect to the number of atoms, it runs *much* slower than the latter two (which are about the same speed).\label{fig:arbfn_comparison}](arbfn_scaled_comparison.png)
+![Comparing `fix arbfn` to control and `fix arbfn/ffield`. The runtime of the former has been divided by 100 to fit it on the graph. While still appearing linear with respect to the number of atoms, it runs *much* slower than the latter two (which are about the same speed).\label{fig:arbfn_comparison}](arbfn_scaled_comparison.png)
 
-Figure \autoref{fig:arbfn_comparison} demonstrates the sharp
+\autoref{fig:arbfn_comparison} demonstrates the sharp
 slope of `fix arbfn`: IPC is extremely costly, and
 frame-by-frame updates should be avoided whenever possible. That
 being said, the time usage appears to scale proportionally to
