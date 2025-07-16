@@ -89,17 +89,13 @@ set of 3N coupled ordinary differential equations of the
 Langevin type written here in 2D for convenience,
 
 $$
-  m_i \ddot{\vec{r_i}} = + F_a \vec{e_i} - \nabla_r V(\vec{r}) -
-  \frac{m_i}{\tau_t}\dot{\vec{r_i}} +
-  \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
+  m_i \ddot{\vec{r_i}} = F_a \vec{e_i} - \nabla_r V(\vec{r}) -\frac{m_i}{\tau_t}\dot{\vec{r_i}} +\sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
 $$
 
 and
 
 $$
-  I_i \ddot{\vec{e_i}}= -\nabla_{\theta} V(\vec{e_i}) -
-  \frac{\alpha I_i}{\tau_t}\dot{\vec{e_i}} +
-  \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
+  I \ddot{\vec{e_i}}= -\nabla_{\theta} V(\vec{e_i}) -\frac{\alpha I}{\tau_t}\dot{\vec{e_i}} + \sqrt{\frac{2\alpha I k_B T}{\tau_t}}\xi(t)
 $$
 
 Here, the activity is imposed as a force, $F_a$, acting along
@@ -395,8 +391,10 @@ rather than software-simulation.
 # Acknowledgements
 
 This material is based upon work supported by the National
-Science Foundation (NSF) under Grant No. 2126451, 2430509. The
-authors gratefully acknowledge the NSF's and Colorado Mesa
-University's support.​
+Science Foundation (NSF) under Grant No. 2126451 and 2430509, as
+well as by the National Aeronautics and Space Administration
+(NASA) MOSAICS grant No. 80NSSC24K0415. The authors gratefully
+acknowledge the NSF's, NASA's, and Colorado Mesa University's
+support.​
 
 # References
