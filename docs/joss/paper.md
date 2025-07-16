@@ -54,23 +54,97 @@ linguistic properties beyond a valid MPI implementation.
 # Introduction
 
 The molecular dynamics simulation software LAMMPS
-(Large-scale Atomic/Molecular Massively Parallel Simulator) was originally developed by a collaboration between government and industry for the direct, all-atom, simulation of materials and biomolecular properties (see for example, [@LAMMPS], [@LAMMPS1], [@LAMMPS2].) Since that time, LAMMPS has been extended in scale and scope to include not only atomistic simulations, but a variety of coarse-grained simulations [@LCG1], implicit-solvent based simulations [@LImSol], including multi-particle dissipative (Langevin) dynamics for both passive and active [@LDias], [@Lcoll1] colloidal systems.
+(Large-scale Atomic/Molecular Massively Parallel Simulator) was
+originally developed by a collaboration between government and
+industry for the direct, all-atom, simulation of materials and
+biomolecular properties (see for example, [@LAMMPS], [@LAMMPS1],
+[@LAMMPS2].) Since that time, LAMMPS has been extended in scale
+and scope to include not only atomistic simulations, but a
+variety of coarse-grained simulations [@LCG1], implicit-solvent
+based simulations [@LImSol], including multi-particle
+dissipative (Langevin) dynamics for both passive and active
+[@LDias], [@Lcoll1] colloidal systems.
 
-Since this latter application was the original motivation for the present undertaking, a brief introduction to the underlying problem will be given here to provide context for the application of the present work, both to the simulation of active colloidal systems as well as other potential applications. For a more comprehensive overview of active matter, including experimental systems as well as the Active Brownian Particle (ABP) and other theoretical models, there are a number of reviews available [@ABJSBKGY], [@ActiveRev2]. For a more pragmatic introduction to LAMMPS for the simulation of ABPs can be found in the paper by Dias [@LDias]. In brief, an active particle (or agent) is an entity which consumes energy and generates its own velocity vector locally, typically via some overall symmetry-breaking, with physical examples ranging from the microscopic, e.g., motile bacteria, synthetic swimmers, sperm cells, to the macroscopic, e.g., animals or vehicles. At the smaller scale, models for so-called active Brownian motion can be implemented by solving the equations of motion for the particles in an implicit solvent. For a system of N active particles in a viscous bath at temperature $T$, LAMMPS solves a set of 3N coupled ordinary differential equations of the Langevin type written here in 2D for convenience,
+Since this latter application was the original motivation for
+the present undertaking, a brief introduction to the underlying
+problem will be given here to provide context for the
+application of the present work, both to the simulation of
+active colloidal systems as well as other potential
+applications. For a more comprehensive overview of active
+matter, including experimental systems as well as the Active
+Brownian Particle (ABP) and other theoretical models, there are
+a number of reviews available [@ABJSBKGY], [@ActiveRev2]. For a
+more pragmatic introduction to LAMMPS for the simulation of ABPs
+can be found in the paper by Dias [@LDias]. In brief, an active
+particle (or agent) is an entity which consumes energy and
+generates its own velocity vector locally, typically via some
+overall symmetry-breaking, with physical examples ranging from
+the microscopic, e.g., motile bacteria, synthetic swimmers,
+sperm cells, to the macroscopic, e.g., animals or vehicles. At
+the smaller scale, models for so-called active Brownian motion
+can be implemented by solving the equations of motion for the
+particles in an implicit solvent. For a system of N active
+particles in a viscous bath at temperature $T$, LAMMPS solves a
+set of 3N coupled ordinary differential equations of the
+Langevin type written here in 2D for convenience,
 
 $$
-  m_i \ddot{\vec{r_i}} = + F_a \vec{e_i} - \nabla_r V(\vec{r}) -\frac{m_i}{\tau_t}\dot{\vec{r_i}} + \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
+  m_i \ddot{\vec{r_i}} = + F_a \vec{e_i} - \nabla_r V(\vec{r}) -
+  \frac{m_i}{\tau_t}\dot{\vec{r_i}} +
+  \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
 $$
 
 and
 
 $$
-  I_i \ddot{\vec{e_i}}= -\nabla_{\theta} V(\vec{e_i}) -\frac{\alpha I_i}{\tau_t}\dot{\vec{e_i}} + \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
+  I_i \ddot{\vec{e_i}}= -\nabla_{\theta} V(\vec{e_i}) -
+  \frac{\alpha I_i}{\tau_t}\dot{\vec{e_i}} +
+  \sqrt{\frac{2m_i k_B T}{\tau_t}}\xi(t)
 $$
 
-Here, the activity is imposed as a force, $F_a$, acting along the orientation vector for the $i$-th particle, $\vec{e_i}$, where the particle has mass $m_i$ and moment of inertia $I_i$. Other forces arising from interactions with particles, external fields, or boundaries can be encoded in the position-dependent potential, $V(\vec{r_i},\vec{e_i})$. The fluid bath interacts through viscous damping, represented by the translational damping time, $\tau_t$, and related to rotational damping through the factor, $\alpha$, and subject to fluctuations via the Gaussian noise term, $\xi$. This treats the fluid implicitly as a passive damping bath that viscously dissipates the motion of the particles and does not include hydrodynamic interactions between particles or particles and boundaries.
+Here, the activity is imposed as a force, $F_a$, acting along
+the orientation vector for the $i$-th particle, $\vec{e_i}$,
+where the particle has mass $m_i$ and moment of inertia $I_i$.
+Other forces arising from interactions with particles, external
+fields, or boundaries can be encoded in the position-dependent
+potential, $V(\vec{r_i},\vec{e_i})$. The fluid bath interacts
+through viscous damping, represented by the translational
+damping time, $\tau_t$, and related to rotational damping
+through the factor, $\alpha$, and subject to fluctuations via
+the Gaussian noise term, $\xi$. This treats the fluid implicitly
+as a passive damping bath that viscously dissipates the motion
+of the particles and does not include hydrodynamic interactions
+between particles or particles and boundaries.
 
-Typically, for low-Reynolds number motion, translational, and often rotational, inertia are ignored, and moreover, there is no straightforward way to include the hydrodynamics of the bath. In many instances, what is interesting about active matter systems is their collective behavior, e.g., emergent non-equilibrium phase-separation [@MIPPS] and anomalous fluid-like viscosity [@AnVisc] in large systems of interacting active agents. Such behavior occurs for models like the ABP model, and while modeling explicit hydrodynamic interactions between confining walls or adjacent active particles directly is possible for small systems and short times, practical simulation of collective behavior is computationally impossible. However, some important and interesting features of such interactions on the dynamics of the active particles themselves could be captured by a heuristic model for the hydrodynamic interactions, which can be implemented as a spatiotemporal modulation of the active free-space velocity of each agent, which may, for example, depend on the evolving particle density distribution itself. External forcing or other parametric inputs are required to include the effects of applied fields or to qualitatively capture the effect of complex hydrodynamic interactions. These can sometimes be facilitated by utilizing LAMMPS fixes. However, while existing LAMMPS fixes are powerful, they are sometimes insufficient. Moreover, a more generalized fix could also be implemented to permit external control of the simulation parameters, e.g., to tie spatiotemporal properties to an external and/or dynamic look-up table, or interaction with an external PINN or AI control system, using the current state of the system as an input.
+Typically, for low-Reynolds number motion, translational, and
+often rotational, inertia are ignored, and moreover, there is no
+straightforward way to include the hydrodynamics of the bath. In
+many instances, what is interesting about active matter systems
+is their collective behavior, e.g., emergent non-equilibrium
+phase-separation [@MIPPS] and anomalous fluid-like viscosity
+[@AnVisc] in large systems of interacting active agents. Such
+behavior occurs for models like the ABP model, and while
+modeling explicit hydrodynamic interactions between confining
+walls or adjacent active particles directly is possible for
+small systems and short times, practical simulation of
+collective behavior is computationally impossible. However,
+some important and interesting features of such interactions on
+the dynamics of the active particles themselves could be
+captured by a heuristic model for the hydrodynamic interactions,
+which can be implemented as a spatiotemporal modulation of the
+active free-space velocity of each agent, which may, for
+example, depend on the evolving particle density distribution
+itself. External forcing or other parametric inputs are required
+to include the effects of applied fields or to qualitatively
+capture the effect of complex hydrodynamic interactions. These
+can sometimes be facilitated by utilizing LAMMPS fixes. However,
+while existing LAMMPS fixes are powerful, they are sometimes
+insufficient. Moreover, a more generalized fix could also be
+implemented to permit external control of the simulation
+parameters, e.g., to tie spatiotemporal properties to an
+external and/or dynamic look-up table, or interaction with an
+external PINN or AI control system, using the current state of
+the system as an input.
 
 Although
 modifying LAMMPS' source code allows efficient implementation of
@@ -167,8 +241,8 @@ used to apply forces based on attributes not feasibly
 implementable solely within LAMMPS.
 
 The protocol for `fix arbfn` is shown in figure
-\autoref{fig:arbfn_protocol}. Note that communication between LAMMPS
-and the "worker" (fix object instance) is virtually free,
+\autoref{fig:arbfn_protocol}. Note that communication between
+LAMMPS and the "worker" (fix object instance) is virtually free,
 while communication between the worker and the controller is
 very expensive.
 
@@ -197,10 +271,11 @@ simulation will perform much better.
 
 ![`fix arbfn/ffield` protocol.\label{fig:ffield_protocol}](ffield_protocol.png)
 
-Although the difference between figures \autoref{fig:arbfn_protocol}
-and \autoref{fig:ffield_protocol} may seem trivial, the omission of
-the controller from the simulation loop allows
-\autoref{fig:ffield_protocol} to run orders of magnitude faster.
+Although the difference between figures
+\autoref{fig:arbfn_protocol} and \autoref{fig:ffield_protocol}
+may seem trivial, the omission of the controller from the
+simulation loop allows \autoref{fig:ffield_protocol} to run
+orders of magnitude faster.
 
 ## `fix arbfn/ffield` with `every n` \label{ffield_every}
 
@@ -220,16 +295,16 @@ center of mass) which was previously impossible.
 
 The protocol for `fix arbfn/ffield` with the
 `every n` argument is shown in figure
-\autoref{fig:ffield_every_protocol}. Note that this reintroduces the
-costly IPC during the simulation, but is still more sparse than
-\autoref{arbfn}.
+\autoref{fig:ffield_every_protocol}. Note that this reintroduces
+the costly IPC during the simulation, but is still more sparse
+than \autoref{arbfn}.
 
 ![`fix arbfn/ffield` protocol when used with the `every n` argument.\label{fig:ffield_every_protocol}](ffield_every_protocol.png)
 
-\autoref{ffield} is a special case of \autoref{ffield_every} where $n$
-is larger than the length of the simulation. Internally, this is
-represented by `every 0`. The other limit case,
-`every 1`, is *nearly* \autoref{arbfn}: It communicates
+\autoref{ffield} is a special case of \autoref{ffield_every}
+where $n$ is larger than the length of the simulation.
+Internally, this is represented by `every 0`. The other limit
+case, `every 1`, is *nearly* \autoref{arbfn}: It communicates
 every frame (and therefore is at least as slow), but the atom
 forces are ultimately still interpolated according to the grid,
 rather than directly controlled.
@@ -267,8 +342,8 @@ script was used to automate the running of scripts.
 
 ![Comparing `fix arbfn` to control and `fix arbfn/ffield`. While still appearing linear with respect to the number of atoms, it runs *much* slower than the latter two (which are about the same speed).\label{fig:arbfn_comparison}](arbfn_scaled_comparison.png)
 
-Figure \autoref{fig:arbfn_comparison} demonstrates the sharp slope
-of `fix arbfn`: IPC is extremely costly, and
+Figure \autoref{fig:arbfn_comparison} demonstrates the sharp
+slope of `fix arbfn`: IPC is extremely costly, and
 frame-by-frame updates should be avoided whenever possible. That
 being said, the time usage appears to scale proportionally to
 control as expected. The `fix arbfn/ffield` results
