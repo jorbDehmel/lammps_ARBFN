@@ -240,7 +240,7 @@ could be applied by using a physical joystick. It can also be
 used to apply forces based on attributes not feasibly
 implementable solely within LAMMPS.
 
-The protocol for `fix arbfn` is shown in figure
+The protocol for `fix arbfn` is shown in
 \autoref{fig:arbfn_protocol}. Note that communication between
 LAMMPS and the "worker" (fix object instance) is virtually free,
 while communication between the worker and the controller is
@@ -264,14 +264,14 @@ interpolation it does is position-only (velocity, existing
 force, and orientation cannot come into play), but is in
 exchange about 100 times faster.
 
-The protocol for the `arbfn/ffield` fix is shown in figure
+The protocol for the `arbfn/ffield` fix is shown in
 \autoref{fig:ffield_protocol}. Note that there are no longer
 costly MPI calls within the simulation loop, and thus the
 simulation will perform much better.
 
 ![`fix arbfn/ffield` protocol.\label{fig:ffield_protocol}](ffield_protocol.png)
 
-Although the difference between figures
+Although the difference between
 \autoref{fig:arbfn_protocol} and \autoref{fig:ffield_protocol}
 may seem trivial, the omission of the controller from the
 simulation loop allows \autoref{fig:ffield_protocol} to run
@@ -289,22 +289,22 @@ to the controller and receives a new interpolation grid in
 return.
 
 This protocol allows more generality at the cost of speed, while
-still being (generally) faster than \autoref{arbfn}. It allows a
+still being (generally) faster than `arbfn`. It allows a
 degree of dependency of the force field on the atomic data (e.g.
 center of mass) which was previously impossible.
 
 The protocol for `fix arbfn/ffield` with the
-`every n` argument is shown in figure
+`every n` argument is shown in
 \autoref{fig:ffield_every_protocol}. Note that this reintroduces
 the costly IPC during the simulation, but is still more sparse
-than \autoref{arbfn}.
+than `arbfn`.
 
 ![`fix arbfn/ffield` protocol when used with the `every n` argument.\label{fig:ffield_every_protocol}](ffield_every_protocol.png)
 
-\autoref{ffield} is a special case of \autoref{ffield_every}
+`arbfn/ffield` is a special case of `arbfn/ffield every n`
 where $n$ is larger than the length of the simulation.
 Internally, this is represented by `every 0`. The other limit
-case, `every 1`, is *nearly* \autoref{arbfn}: It communicates
+case, `every 1`, is *nearly* `arbfn`: It communicates
 every frame (and therefore is at least as slow), but the atom
 forces are ultimately still interpolated according to the grid,
 rather than directly controlled.
