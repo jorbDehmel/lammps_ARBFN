@@ -353,8 +353,6 @@ narrow.
 
 # Conclusion
 
-(SOME ADDITIONS HERE, NOT MUCH)
-
 We discussed the implementation of the `ARBFN` package for
 LAMMPS, including a brief analysis of its performance as
 simulations scaled. This package allows LAMMPS fixes which are
@@ -400,4 +398,3 @@ Supported by NSF grant 2126451. Based upon work partially
 funded by Colorado Mesa University.
 
 # References
-
