@@ -5,6 +5,11 @@
 
 J Dehmel, J Schiffbauer, Colorado Mesa University 2024/25 (MIT License)
 
+# For More Help
+
+If this document is not sufficient for your needs, more
+documentation can be found [here](./docs/manual/main.md).
+
 ## Motivation and Abstract
 
 When dielectric colloidal Janus particles are placed in
